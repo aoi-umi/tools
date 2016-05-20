@@ -1,0 +1,24 @@
+﻿<UserControl x:Class="tools.RegexControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="700">
+    <Grid>
+        <UniformGrid Rows="2">
+                <DockPanel>
+                    <TextBlock DockPanel.Dock="Top">输入</TextBlock>
+                    <RichTextBox Name="InputBox" TextChanged="Input_TextChanged"></RichTextBox>
+                </DockPanel>
+            <RichTextBox Name="OutputBox" IsReadOnly="True" Margin="5,15,0,0" IsTabStop="False"></RichTextBox>
+            <DockPanel>
+                <TextBlock DockPanel.Dock="Top">正则</TextBlock>
+                <RichTextBox Name="RegexBox"  TextChanged="Input_TextChanged" AcceptsReturn="False" AcceptsTab="False"></RichTextBox>
+            </DockPanel>
+            <Border Margin="5,15,0,0" BorderThickness="1" BorderBrush="Gray">
+                <WebBrowser Name="MatchBox"></WebBrowser>
+            </Border>
+        </UniformGrid>
+    </Grid>
+</UserControl>
