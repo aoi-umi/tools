@@ -20,8 +20,10 @@ namespace tools
         public RenameControl()
         {
             InitializeComponent();
+            FileList = new ObservableCollection<FileInfoModel>();
             FileListView.ItemsSource = FileList;
             CurrView = RenameByNewNameView;
+            AddCharset();
         }
 
         private string Path
@@ -47,7 +49,7 @@ namespace tools
 
         private DockPanel CurrView { get; set; }
 
-        private ObservableCollection<FileInfoModel> FileList = new ObservableCollection<FileInfoModel>();
+        private ObservableCollection<FileInfoModel> FileList { get; set; }
 
         private void GetFileList()
         {
@@ -65,7 +67,7 @@ namespace tools
                     {
                         FileList.Add(new FileInfoModel()
                         {
-                            Path = Path.EndsWith("\\") ? Path : Path + "\\",
+                            Path = Path.EndsWith("\\") || Path.EndsWith("/") ? Path : Path + "\\",
                             OldFilename = CurrFile.Name
                         });
                     }
@@ -76,7 +78,7 @@ namespace tools
                     {
                         FileList.Add(new FileInfoModel()
                         {
-                            Path = Path.EndsWith("\\") ? Path : Path + "\\",
+                            Path = Path.EndsWith("\\") || Path.EndsWith("/") ? Path : Path + "\\",
                             OldFilename = CurrFolder.Name
                         });
                     }
@@ -95,6 +97,93 @@ namespace tools
             int index = str.LastIndexOf(".");
             if (index >= 0) Suf = str.Substring(index);
             return Suf;
+        }
+
+        private void AddCharset()
+        {
+            foreach (EncodingInfo ei in Encoding.GetEncodings())
+            {
+                Encoding e = ei.GetEncoding();
+                if (true)
+                {
+                    //Console.Write("{0,-18} ", ei.Name);
+                    //Console.Write("{0,-9} ", e.CodePage);
+                    //Console.Write("{0,-18} ", e.BodyName);
+                    //Console.Write("{0,-18} ", e.HeaderName);
+                    //Console.Write("{0,-18} ", e.WebName);
+                    //Console.WriteLine("{0} ", e.EncodingName);
+                    ComboBoxItem charset = new ComboBoxItem() { Content = e.EncodingName + "(" + e.WebName + ")", Tag = e.WebName };
+                    CharsetBox.Items.Add(charset);
+                }
+
+            }
+        }
+
+        private void PreviewByNewName()
+        {
+            int Num = 0;
+            int NumLen = NumBox.Text.Length;
+            string Suf = SufBox.Text.Trim();
+            if (!int.TryParse(NumBox.Text, out Num)) { NumBox.Focus(); throw new Exception("请输入正确整数"); }
+            foreach (var fileinfo in FileList)
+            {
+                string NewSuf = string.Empty;
+                if (!string.IsNullOrEmpty(Suf)) NewSuf = "." + Suf;
+                else NewSuf = GetSuf(fileinfo.OldFilename);
+                if (NewNameBox.Text.IndexOf("<>") >= 0)
+                    fileinfo.NewFilename = string.Format("{0}{1}", NewNameBox.Text, NewSuf).Replace("<>", Num.ToString("D" + NumLen));
+                else
+                    fileinfo.NewFilename = string.Format("{0}{1}{2}", NewNameBox.Text, Num.ToString("D" + NumLen), NewSuf);
+                ++Num;
+                fileinfo.Status = "";
+            }
+        }
+
+        private void PreviewByReplace()
+        {
+            foreach (var fileinfo in FileList)
+            {
+                fileinfo.NewFilename = fileinfo.OldFilename.Replace(OldStringBox.Text, NewStringBox.Text);
+                fileinfo.Status = "";
+            }
+        }
+
+        private void PreviewByEncoding()
+        {
+            string charset = (CharsetBox.SelectedItem as ComboBoxItem).Tag.ToString();
+            Encoding encoding = Encoding.GetEncoding(charset);
+            Encoding defaultEncoding = Encoding.Default;
+            foreach (var fileinfo in FileList)
+            {
+                fileinfo.NewFilename = encoding.GetString(defaultEncoding.GetBytes(fileinfo.OldFilename));
+                fileinfo.Status = "";
+            }
+        }
+
+        private void PreviewByInsert()
+        {
+            int InsertIndex = 0;
+            if (!int.TryParse(InsertIndexBox.Text, out InsertIndex)) { InsertIndexBox.Focus(); throw new Exception("请输入正确整数"); }
+            foreach (var fileinfo in FileList)
+            {
+                int SufIndex = fileinfo.OldFilename.LastIndexOf(".");
+                string Name = SufIndex >= 0 ? fileinfo.OldFilename.Substring(0, SufIndex) : fileinfo.OldFilename;
+                string Suf = GetSuf(fileinfo.OldFilename);
+                int TrueInsertIndex = InsertIndex;
+                if (InsertIndex > Name.Length) TrueInsertIndex = Name.Length;
+                else if (InsertIndex < 0) TrueInsertIndex = Name.Length + InsertIndex < 0 ? 0 : Name.Length + InsertIndex;
+                fileinfo.NewFilename = Name.Insert(TrueInsertIndex, InsertStringBox.Text) + Suf;
+                fileinfo.Status = "";
+            }
+        }
+
+        private void PreviewByResetName()
+        {
+            foreach (var fileinfo in FileList)
+            {
+                fileinfo.NewFilename = "";
+                fileinfo.Status = "";
+            }
         }
 
         private void ShowMessage(string message)
@@ -170,56 +259,24 @@ namespace tools
             try
             {
                 int SelectedIndex = RenameSelectBox.SelectedIndex;
-                int Num = 0;
-                int NumLen = NumBox.Text.Length;
-                string Suf = SufBox.Text.Trim();
-                if (SelectedIndex == 0 && !int.TryParse(NumBox.Text, out Num)) { NumBox.Focus(); throw new Exception("请输入正确整数"); }
 
-                Encoding encoding = null;
-                Encoding defaultEncoding = null;
-                if (SelectedIndex == 2)
+                switch (SelectedIndex)
                 {
-                    string charset = CharsetBox.Text;
-                    encoding = Encoding.GetEncoding(charset);
-                    defaultEncoding = Encoding.Default;
-                }
-
-                int InsertIndex = 0;
-                if (SelectedIndex == 3 && !int.TryParse(InsertIndexBox.Text, out InsertIndex)) { InsertIndexBox.Focus(); throw new Exception("请输入正确整数"); }
-                foreach (var fileinfo in FileList)
-                {
-                    switch (SelectedIndex)
-                    {
-                        case 0:
-                            string NewSuf = string.Empty;
-                            if (!string.IsNullOrEmpty(Suf)) NewSuf = "." + Suf;
-                            else NewSuf = GetSuf(fileinfo.OldFilename);
-                            if (NewNameBox.Text.IndexOf("<>") >= 0)
-                                fileinfo.NewFilename = string.Format("{0}{1}", NewNameBox.Text, NewSuf).Replace("<>", Num.ToString("D" + NumLen));
-                            else
-                                fileinfo.NewFilename = string.Format("{0}{1}{2}", NewNameBox.Text, Num.ToString("D" + NumLen), NewSuf);
-                            ++Num;
-                            break;
-                        case 1:
-                            fileinfo.NewFilename = fileinfo.OldFilename.Replace(OldStringBox.Text, NewStringBox.Text);
-                            break;
-                        case 2:                            
-                            fileinfo.NewFilename = encoding.GetString(defaultEncoding.GetBytes(fileinfo.OldFilename));
-                            break;
-                        case 3:
-                            int SufIndex = fileinfo.OldFilename.LastIndexOf(".");
-                            string Name = SufIndex >= 0 ? fileinfo.OldFilename.Substring(0, SufIndex) : fileinfo.OldFilename;
-                            Suf = GetSuf(fileinfo.OldFilename);
-                            int TrueInsertIndex = InsertIndex;
-                            if (InsertIndex > Name.Length) TrueInsertIndex = Name.Length;
-                            else if (InsertIndex < 0) TrueInsertIndex = Name.Length + InsertIndex < 0 ? 0 : Name.Length + InsertIndex;
-                            fileinfo.NewFilename = Name.Insert(TrueInsertIndex, InsertStringBox.Text) + Suf;
-                            break;
-                        default:
-                            fileinfo.NewFilename = "";
-                            break;
-                    }
-                    fileinfo.Status = "";
+                    case 0:
+                        PreviewByNewName();
+                        break;
+                    case 1:
+                        PreviewByReplace();
+                        break;
+                    case 2:
+                        PreviewByEncoding();
+                        break;
+                    case 3:
+                        PreviewByInsert();
+                        break;
+                    default:
+                        PreviewByResetName();
+                        break;
                 }
             }
             catch (Exception ex)
@@ -307,11 +364,17 @@ namespace tools
                 }                
             }
         }
+        
         #endregion
+
     }
 
     public class FileInfoModel : INotifyPropertyChanged
     {
+        public FileInfoModel()
+        {
+        }
+
         public string Path { get; set; }
 
         public string OldFilename { get; set; }
@@ -332,7 +395,7 @@ namespace tools
         {
             get { return _IsSuccess; }
             set { if (_IsSuccess != value) { _IsSuccess = value; MyPropertyChanged("IsSuccess"); } }
-        }
+        }        
 
         public event PropertyChangedEventHandler PropertyChanged;
 

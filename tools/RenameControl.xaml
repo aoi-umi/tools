@@ -66,7 +66,7 @@
                                 <TextBlock HorizontalAlignment="Right">序号</TextBlock>
                                 <TextBox Name="NumBox">01</TextBox>
                             </UniformGrid>
-                            <TextBlock DockPanel.Dock="Right" Text="&lt;&gt;符为数字插入位置"></TextBlock>
+                            <TextBlock DockPanel.Dock="Right" Text="&lt;&gt;符为序号插入位置"></TextBlock>
                             <TextBox Name="NewNameBox"></TextBox>
                         </DockPanel>
                         <DockPanel Name="RenameByReplaceStringView" Grid.Column="1" Visibility="Collapsed">
@@ -88,7 +88,6 @@
                         <DockPanel Name="RenameByEncodingView" Grid.Column="1" Visibility="Collapsed">
                             <TextBlock>字符集</TextBlock>
                             <ComboBox Name="CharsetBox" IsEditable="True" SelectedIndex="0">
-                                <ComboBoxItem>Shift-JIS</ComboBoxItem>
                             </ComboBox>
                         </DockPanel>
                         <DockPanel Name="RenameByInsertStringView" Grid.Column="1" Visibility="Collapsed">
@@ -129,8 +128,8 @@
                         <GridViewColumn Header="新文件名" Width="200">
                             <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <ContentPresenter Content="{Binding Path=NewFilename}" />
-                            </DataTemplate>
+                                        <TextBox Text="{Binding Path=NewFilename}" MinWidth="100"></TextBox>
+                                </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
                         <GridViewColumn Header="状态" Width="200">
