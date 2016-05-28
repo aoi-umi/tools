@@ -13,6 +13,9 @@
             <TabItem Header="批量重命名">
                 <my:RenameControl/>
             </TabItem>
+            <TabItem Header="代码预览">
+                <my:CodeControl/>
+            </TabItem>
         </TabControl>
     </Grid>
 </Window>

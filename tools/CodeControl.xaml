@@ -1,0 +1,34 @@
+﻿<UserControl xmlns:my="clr-namespace:tools" x:Class="tools.CodeControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d"              
+             xmlns:ic="clr-namespace:ICSharpCode.AvalonEdit;assembly=ICSharpCode.AvalonEdit"
+             d:DesignHeight="300" d:DesignWidth="300">
+    <UserControl.Resources>
+        <my:HighlightingDefinitionConverter x:Key="HighlightingDefinitionConverter"/>
+    </UserControl.Resources>
+    <DockPanel>
+        <ComboBox Name="SyntaxBox" SelectionChanged="HighlightingComboBox_SelectionChanged" DockPanel.Dock="Top" SelectedIndex="1" IsEditable="True" IsReadOnly="True">
+            <ComboBoxItem>XmlDoc</ComboBoxItem>
+            <ComboBoxItem>C#</ComboBoxItem>
+            <ComboBoxItem>JavaScript</ComboBoxItem>
+            <ComboBoxItem>HTML</ComboBoxItem>
+            <ComboBoxItem>ASP3/XHTML</ComboBoxItem>
+            <ComboBoxItem>Boo</ComboBoxItem>
+            <ComboBoxItem>Coco</ComboBoxItem>
+            <ComboBoxItem>CSS</ComboBoxItem>
+            <ComboBoxItem>C++</ComboBoxItem>
+            <ComboBoxItem>Java</ComboBoxItem>
+            <ComboBoxItem>Patch</ComboBoxItem>
+            <ComboBoxItem>PowerShell</ComboBoxItem>
+            <ComboBoxItem>PHP</ComboBoxItem>
+            <ComboBoxItem>TeX</ComboBoxItem>
+            <ComboBoxItem>VB</ComboBoxItem>
+            <ComboBoxItem>XML</ComboBoxItem>
+            <ComboBoxItem>MarkDown</ComboBoxItem>
+        </ComboBox>
+        <ic:TextEditor Name="textEditor" ShowLineNumbers="True" SyntaxHighlighting="{Binding Text,ElementName=SyntaxBox,Converter={StaticResource HighlightingDefinitionConverter}}"></ic:TextEditor>
+    </DockPanel>
+</UserControl>

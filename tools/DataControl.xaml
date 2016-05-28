@@ -10,6 +10,9 @@
             <Setter Property="VerticalAlignment" Value="Center"></Setter>
             <Setter Property="HorizontalAlignment" Value="Left"></Setter>
         </Style>
+        <Style TargetType="TextBox">
+            <Setter Property="Margin" Value="0,2"></Setter>
+        </Style>
         <Style TargetType="CheckBox">
             <Setter Property="VerticalAlignment" Value="Center"></Setter>
             <Setter Property="HorizontalAlignment" Value="Left"></Setter>
