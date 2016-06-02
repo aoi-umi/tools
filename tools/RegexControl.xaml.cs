@@ -60,7 +60,7 @@ namespace tools
             set
             {
                 if (string.IsNullOrEmpty(value)) MatchBox.NavigateToString("<html></html>");
-                else MatchBox.NavigateToString(value);
+                else MatchBox.NavigateToString(ConvertExtendedASCII(value));
             }
         }
 
@@ -98,6 +98,22 @@ namespace tools
                 MatchString = string.Empty;
                 OutputString = DateTime.Now.ToString("HH:mm:ss") + "\r\n" + ex.ToString();
             }
+        }
+
+        private static string ConvertExtendedASCII(string HTML)
+        {
+            string retVal = "";
+            char[] s = HTML.ToCharArray();
+
+            foreach (char c in s)
+            {
+                if (Convert.ToInt32(c) > 127)
+                    retVal += "&#" + Convert.ToInt32(c) + ";";
+                else
+                    retVal += c;
+            }
+
+            return retVal;
         }
 
         private void WriteLog()

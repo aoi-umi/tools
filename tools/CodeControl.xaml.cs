@@ -53,7 +53,6 @@ namespace tools
                     case "XML":
                     case "HTML":
                     case "ASP/XHTML":
-                        foldingStrategy = new XmlFoldingStrategy();
                         textEditor.TextArea.IndentationStrategy = new ICSharpCode.AvalonEdit.Indentation.DefaultIndentationStrategy();
                         foldingStrategy = null;
                         break;
