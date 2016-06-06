@@ -54,7 +54,7 @@ namespace tools
                     case "HTML":
                     case "ASP/XHTML":
                         textEditor.TextArea.IndentationStrategy = new ICSharpCode.AvalonEdit.Indentation.DefaultIndentationStrategy();
-                        foldingStrategy = null;
+                        foldingStrategy = new XmlFoldingStrategy();
                         break;
                     case "C#":
                     case "C++":
