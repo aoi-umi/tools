@@ -1,0 +1,23 @@
+﻿<UserControl x:Class="tools.EncodeDecodeControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="700">
+    <Grid>
+        <DockPanel>
+            <TabControl Name="Tab" DockPanel.Dock="Top">
+                <TabItem Header="base64" Name="base64">base64</TabItem>
+            </TabControl>
+            <UniformGrid Rows="1"  DockPanel.Dock="Bottom">
+                <Button Content="Decode" Click="DecodeButton_Click"/>
+                <Button Content="Encode" Click="EncodeButton_Click"/>
+            </UniformGrid>
+            <UniformGrid Rows="1">
+                <TextBox Name="DecodeBox" AcceptsReturn="true" TextWrapping="Wrap"></TextBox>
+                <TextBox Name="EncodeBox" AcceptsReturn="true" TextWrapping="Wrap"></TextBox>
+            </UniformGrid>
+        </DockPanel>
+    </Grid>
+</UserControl>

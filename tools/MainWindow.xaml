@@ -16,6 +16,9 @@
             <TabItem Header="代码预览">
                 <my:CodeControl/>
             </TabItem>
+            <TabItem Header="简单加密解密">
+                <my:EncodeDecodeControl/>
+            </TabItem>
         </TabControl>
     </Grid>
 </Window>

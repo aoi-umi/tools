@@ -42,6 +42,8 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xaml" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Core" />
@@ -59,6 +61,9 @@
     <Compile Include="CodeControl.xaml.cs">
       <DependentUpon>CodeControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="EncodeDecodeControl.xaml.cs">
+      <DependentUpon>EncodeDecodeControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="RegexControl.xaml.cs">
       <DependentUpon>RegexControl.xaml</DependentUpon>
     </Compile>
@@ -70,6 +75,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="DataControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="EncodeDecodeControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
