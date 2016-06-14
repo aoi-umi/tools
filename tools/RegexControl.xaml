@@ -5,16 +5,22 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="700">
+    <UserControl.Resources>
+        <Style TargetType="TextBox">
+            <Setter Property="VerticalScrollBarVisibility" Value="Auto"></Setter>
+            <Setter Property="TextWrapping" Value="Wrap"></Setter>
+        </Style>
+    </UserControl.Resources>
     <Grid>
         <UniformGrid Rows="2">
-                <DockPanel>
-                    <TextBlock DockPanel.Dock="Top">输入</TextBlock>
-                    <RichTextBox Name="InputBox" TextChanged="Input_TextChanged"></RichTextBox>
-                </DockPanel>
-            <RichTextBox Name="OutputBox" IsReadOnly="True" Margin="5,15,0,0" IsTabStop="False"></RichTextBox>
+            <DockPanel>
+                <TextBlock DockPanel.Dock="Top">输入</TextBlock>
+                <TextBox Name="InputBox" TextChanged="Input_TextChanged" AcceptsReturn="True"/>
+            </DockPanel>
+            <TextBox Name="OutputBox" IsReadOnly="True" Margin="5,15,0,0" IsTabStop="False"/>
             <DockPanel>
                 <TextBlock DockPanel.Dock="Top">正则</TextBlock>
-                <RichTextBox Name="RegexBox"  TextChanged="Input_TextChanged" AcceptsReturn="False" AcceptsTab="False"></RichTextBox>
+                <TextBox Name="RegexBox"  TextChanged="Input_TextChanged" AcceptsReturn="False" AcceptsTab="False"/>
             </DockPanel>
             <Border Margin="5,15,0,0" BorderThickness="1" BorderBrush="Gray">
                 <WebBrowser Name="MatchBox"></WebBrowser>

@@ -14,9 +14,6 @@ namespace tools
         public RegexControl()
         {
             InitializeComponent();
-            InputBox.Document.LineHeight = 1;
-            OutputBox.Document.LineHeight = 1;
-            RegexBox.Document.LineHeight = 1;
             InputString = "http://127.0.0.1\r\nhosthttp://127.0.0.1\r\n<a href=\"http://127.0.0.1\">http://127.0.0.1</a>";
             RegexString = @"(?<!<a.*)(?:http|https)://[^\s]+";
         }
@@ -24,12 +21,11 @@ namespace tools
         {
             get
             {
-                return new TextRange(InputBox.Document.ContentStart, InputBox.Document.ContentEnd).Text.Trim();
+                return InputBox.Text.Trim();
             }
             set
             {
-                InputBox.Document.Blocks.Clear();
-                InputBox.AppendText(value);
+                InputBox.Text = value;
             }
         }
 
@@ -37,8 +33,7 @@ namespace tools
         {
             set
             {
-                OutputBox.Document.Blocks.Clear();
-                OutputBox.AppendText(value);
+                OutputBox.Text = value;
             }
         }
 
@@ -46,12 +41,11 @@ namespace tools
         {
             get
             {
-                return new TextRange(RegexBox.Document.ContentStart, RegexBox.Document.ContentEnd).Text.Trim();
+                return RegexBox.Text.Trim();
             }
             set
             {
-                RegexBox.Document.Blocks.Clear();
-                RegexBox.AppendText(value);
+                RegexBox.Text = value;
             }
         }
 

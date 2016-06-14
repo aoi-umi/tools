@@ -5,10 +5,54 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="700">
+    <UserControl.Resources>
+        <Style TargetType="TextBlock">
+            <Setter Property="VerticalAlignment" Value="Center"></Setter>
+        </Style>
+        <Style TargetType="Button">
+            <Setter Property="Margin" Value="5,5"></Setter>
+        </Style>
+        <Style TargetType="TextBox">
+            <Setter Property="Margin" Value="0,5"></Setter>
+            <Setter Property="VerticalScrollBarVisibility" Value="Auto"></Setter>
+        </Style>
+    </UserControl.Resources>
     <Grid>
         <DockPanel>
             <TabControl Name="Tab" DockPanel.Dock="Top">
                 <TabItem Header="base64" Name="base64">base64</TabItem>
+                <TabItem Header="凯撒加密" Name="caesar">
+                    <DockPanel>
+                        <TextBlock>位移</TextBlock>
+                        <TextBlock DockPanel.Dock="Right">填0或空遍历</TextBlock>
+                        <TextBox Name="CaesarOffsetBox"></TextBox>
+                    </DockPanel>
+                </TabItem>
+                <TabItem Header="摩斯电码" Name="morse">
+                    <UniformGrid Rows="1">
+                        <StackPanel>
+                            <TextBlock>映射</TextBlock>
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition></RowDefinition>
+                                    <RowDefinition></RowDefinition>
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="10"></ColumnDefinition>
+                                    <ColumnDefinition></ColumnDefinition>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="." Grid.Row="0" Grid.Column="0"></TextBlock>
+                                <TextBox Name="MorseShortValueBox" Grid.Row="0" Grid.Column="1"></TextBox>
+                                <TextBlock Text="-" Grid.Row="1" Grid.Column="0"></TextBlock>
+                                <TextBox Name="MorseLongValueBox" Grid.Row="1" Grid.Column="1"></TextBox>
+                            </Grid>
+                        </StackPanel>
+                        <StackPanel>
+                            <TextBlock>分隔符</TextBlock>
+                            <TextBox Name="MorseSplitValueBox"></TextBox>
+                        </StackPanel>
+                    </UniformGrid>
+                </TabItem>
             </TabControl>
             <UniformGrid Rows="1"  DockPanel.Dock="Bottom">
                 <Button Content="Decode" Click="DecodeButton_Click"/>

@@ -9,6 +9,7 @@ using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
+using System.Text.RegularExpressions;
 
 namespace tools
 {
@@ -141,10 +142,17 @@ namespace tools
 
         private void PreviewByReplace()
         {
-            foreach (var fileinfo in FileList)
+            try
             {
-                fileinfo.NewFilename = fileinfo.OldFilename.Replace(OldStringBox.Text, NewStringBox.Text);
-                fileinfo.Status = "";
+                foreach (var fileinfo in FileList)
+                {
+                    fileinfo.NewFilename = Regex.Replace(fileinfo.OldFilename, OldStringBox.Text, NewStringBox.Text);
+                    fileinfo.Status = "";
+                }
+            }
+            catch (Exception ex)
+            {
+                ShowMessage(ex.ToString());
             }
         }
 
