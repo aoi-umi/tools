@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Windows;
 using System.Windows.Controls;
+using System.Text.RegularExpressions;
+using Newtonsoft.Json;
+using System.IO;
 
 namespace tools
 {
@@ -21,6 +24,15 @@ namespace tools
         private string OutputString
         {
             set { outputBox.Text = value; }
+        }
+
+        private string DataBaseName
+        {
+            get { return DataBaseBox.Text; }
+        }
+        private string DataBasePre
+        {
+            get { return DataBasePreBox.Text; }
         }
 
         private string TableName
@@ -83,22 +95,41 @@ namespace tools
                     case "AddPreAndSuf":
                         OutputString = ForAddPreAndSuf(split);
                         break;
+                    case "RegReplaceString": OutputString = ReplaceString(InputString);
+                        break;
+                    case"JsonBeautify":
+                        OutputString = BeautifyJsonString(InputString);
+                        break;
                 }
             }
         }
 
         private string ForProcedure(string[] split)
         {
-            string p = "CREATE PROCEDURE p_" + TableName + "_Save\r\n{0}AS\r\nBEGIN\r\nSET NOCOUNT ON;\r\n{1}END\r\nGO\r\n";
+            string p = string.Empty;
+            string beginif = string.Empty;
+            string endif = string.Empty;
+            string beginelse = string.Empty;
+            string endelse = string.Empty;
+            switch (DataBaseName)
+            {
+                case "sql server": p = "CREATE PROCEDURE p_" + TableName + "_Save\r\n{0}AS\r\nBEGIN\r\nSET NOCOUNT ON;\r\n{1}END\r\nGO\r\n";
+                    beginif = beginelse = "BEGIN\r\n";
+                    endif = "END\r\n";break;
+                case "mysql": p = "CREATE PROCEDURE p_" + TableName + "_Save\r\n{0}BEGIN\r\n{1}END\r\n";
+                    beginif = "THEN\r\n";
+                    endif = "END IF;\r\n";
+                    break;
+            }
             string args = "(\r\n";
-            var insertString = "IF @" + IgnoreIdName + " is null or @" + IgnoreIdName + " = 0\r\nBEGIN\r\nINSERT  INTO " + TableName + "(\r\n";
+            var insertString = "IF " + DataBasePre + IgnoreIdName + " is null or " + DataBasePre + IgnoreIdName + " = 0\r\n" + beginif + "INSERT  INTO " + TableName + "(\r\n";
             try
             {
                 foreach (var s in split)
                 {
                     var a = s.Trim().Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
                     if (a.Length < 2) throw new Exception("\r\n请按\r\narg1 int\r\narg2 int\r\n...\r\n的格式输入");
-                    args += "@" + a[0] + " " + a[1] + ",\r\n";
+                    args += DataBasePre + a[0] + " " + a[1] + ",\r\n";
                     if ((bool)IgnoreIDBox.IsChecked && s.Trim().Split(' ')[0].ToLower() == IgnoreIdName.ToLower())
                     {
                         continue;
@@ -118,15 +149,15 @@ namespace tools
                 args += ")\r\n";
 
                 insertString += ")\r\nVALUES(\r\n";
-                var updateString = "ELSE \r\nBEGIN\r\nUPDATE " + TableName + "\r\nSET\r\n";
+                var updateString = "ELSE \r\n" + beginelse +"UPDATE " + TableName + "\r\nSET\r\n";
                 foreach (var s in split)
                 {
                     if ((bool)IgnoreIDBox.IsChecked && s.Trim().Split(' ')[0].ToLower() == IgnoreIdName.ToLower())
                     {
                         continue;
                     }
-                    insertString += "@" + s.Trim().Split(' ')[0] + ",\r\n";
-                    updateString += s.Trim().Split(' ')[0] + " = @" + s.Trim().Split(' ')[0] + ",\r\n";
+                    insertString += DataBasePre + s.Trim().Split(' ')[0] + ",\r\n";
+                    updateString += s.Trim().Split(' ')[0] + " = " + DataBasePre + s.Trim().Split(' ')[0] + ",\r\n";
                 }
                 if (insertString.EndsWith(",\r\n"))
                 {
@@ -136,8 +167,8 @@ namespace tools
                 {
                     updateString = updateString.Remove(updateString.Length - 3, 1);
                 }
-                insertString += ");\r\nEND\r\n";
-                updateString += "WHERE " + IgnoreIdName + " = @" + IgnoreIdName + "\r\nEND\r\n";
+                insertString += ");\r\n" + endif;
+                updateString += "WHERE " + IgnoreIdName + " = " + DataBasePre + IgnoreIdName + "\r\nEND\r\n";
                 var output = string.Format(p, args, insertString + ((bool)UpdateBox.IsChecked ? updateString : ""));
                 var ignore = IgnoreCharForProcedureString.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
                 foreach (string i in ignore)
@@ -225,6 +256,51 @@ namespace tools
                 return output;
             }
             catch (Exception ex)
+            {
+                return ex.ToString();
+            }
+        }
+
+        private string ReplaceString(string input)
+        {
+            string output = string.Empty;
+            try
+            {
+                return Regex.Replace(input, OldStringBox.Text, NewStringBox.Text);
+            }
+            catch (Exception ex)
+            {
+                return ex.ToString();
+            }
+        }
+
+        private string BeautifyJsonString(string input)
+        {
+            try
+            {
+                //格式化json字符串
+                JsonSerializer serializer = new JsonSerializer();
+                TextReader tr = new StringReader(input);
+                JsonTextReader jtr = new JsonTextReader(tr);
+                object obj = serializer.Deserialize(jtr);
+                if (obj != null)
+                {
+                    StringWriter textWriter = new StringWriter();
+                    JsonTextWriter jsonWriter = new JsonTextWriter(textWriter)
+                    {
+                        Formatting = Formatting.Indented,
+                        Indentation = 2,
+                        IndentChar = ' '
+                    };
+                    serializer.Serialize(jsonWriter, obj);
+                    return textWriter.ToString();
+                }
+                else
+                {
+                    return input;
+                }
+            }
+            catch(Exception ex)
             {
                 return ex.ToString();
             }
