@@ -68,6 +68,16 @@
     <Compile Include="EncodeDecodeControl.xaml.cs">
       <DependentUpon>EncodeDecodeControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="HTMLConverterControl.xaml.cs">
+      <DependentUpon>HTMLConverterControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="HTMLConverter\htmlcssparser.cs" />
+    <Compile Include="HTMLConverter\htmlfromxamlconverter.cs" />
+    <Compile Include="HTMLConverter\htmllexicalanalyzer.cs" />
+    <Compile Include="HTMLConverter\htmlparser.cs" />
+    <Compile Include="HTMLConverter\htmlschema.cs" />
+    <Compile Include="HTMLConverter\htmltokentype.cs" />
+    <Compile Include="HTMLConverter\htmltoxamlconverter.cs" />
     <Compile Include="RegexControl.xaml.cs">
       <DependentUpon>RegexControl.xaml</DependentUpon>
     </Compile>
@@ -83,6 +93,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="EncodeDecodeControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="HTMLConverterControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

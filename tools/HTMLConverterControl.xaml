@@ -1,0 +1,41 @@
+﻿<UserControl x:Class="tools.HTMLConverterControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="700">
+    <UserControl.Resources>
+        <Style TargetType="TextBox">
+            <Setter Property="AcceptsReturn" Value="True"></Setter>
+            <Setter Property="AcceptsTab" Value="True"></Setter>
+            <Setter Property="TextWrapping" Value="Wrap"></Setter>
+            <Setter Property="VerticalScrollBarVisibility" Value="Auto"></Setter>
+        </Style>        
+    </UserControl.Resources>
+    <Grid>
+        <DockPanel>
+            <StackPanel DockPanel.Dock="Top">
+                <Button Margin="3" Click="Button_Click">在RichTextBox上预览</Button>
+            </StackPanel>
+            <UniformGrid Rows="2" Columns="2">
+                <DockPanel>
+                    <TextBlock DockPanel.Dock="Top">html</TextBlock>
+                    <TextBox Name="HtmlBox" TextChanged="HtmlBox_TextChanged"></TextBox>
+                </DockPanel>
+                <DockPanel>
+                    <TextBlock DockPanel.Dock="Top">RichTextBox</TextBlock>
+                    <RichTextBox IsReadOnly="True" Name="PreviewRichTextBox"></RichTextBox>
+                </DockPanel>
+                <DockPanel>
+                    <TextBlock DockPanel.Dock="Top">xaml</TextBlock>
+                    <TextBox Name="XamlBox"></TextBox>
+                </DockPanel>
+                <DockPanel>
+                    <TextBlock DockPanel.Dock="Top">output</TextBlock>
+                    <TextBox Name="OutputBox"></TextBox>
+                </DockPanel>
+            </UniformGrid>
+        </DockPanel>
+    </Grid>
+</UserControl>

@@ -30,6 +30,7 @@ namespace tools
         {
             get { return DataBaseBox.Text; }
         }
+
         private string DataBasePre
         {
             get { return DataBasePreBox.Text; }
@@ -95,9 +96,10 @@ namespace tools
                     case "AddPreAndSuf":
                         OutputString = ForAddPreAndSuf(split);
                         break;
-                    case "RegReplaceString": OutputString = ReplaceString(InputString);
+                    case "RegReplaceString": 
+                        OutputString = ReplaceString(InputString);
                         break;
-                    case"JsonBeautify":
+                    case "JsonBeautify":
                         OutputString = BeautifyJsonString(InputString);
                         break;
                 }
@@ -115,7 +117,7 @@ namespace tools
             {
                 case "sql server": p = "CREATE PROCEDURE p_" + TableName + "_Save\r\n{0}AS\r\nBEGIN\r\nSET NOCOUNT ON;\r\n{1}END\r\nGO\r\n";
                     beginif = beginelse = "BEGIN\r\n";
-                    endif = "END\r\n";break;
+                    endif = "END\r\n"; break;
                 case "mysql": p = "CREATE PROCEDURE p_" + TableName + "_Save\r\n{0}BEGIN\r\n{1}END\r\n";
                     beginif = "THEN\r\n";
                     endif = "END IF;\r\n";
@@ -149,7 +151,7 @@ namespace tools
                 args += ")\r\n";
 
                 insertString += ")\r\nVALUES(\r\n";
-                var updateString = "ELSE \r\n" + beginelse +"UPDATE " + TableName + "\r\nSET\r\n";
+                var updateString = "ELSE \r\n" + beginelse + "UPDATE " + TableName + "\r\nSET\r\n";
                 foreach (var s in split)
                 {
                     if ((bool)IgnoreIDBox.IsChecked && s.Trim().Split(' ')[0].ToLower() == IgnoreIdName.ToLower())
@@ -300,7 +302,7 @@ namespace tools
                     return input;
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return ex.ToString();
             }
