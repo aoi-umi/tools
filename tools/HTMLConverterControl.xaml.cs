@@ -19,6 +19,11 @@ namespace tools
 
         private void HtmlBox_TextChanged(object sender, TextChangedEventArgs e)
         {
+            
+        }
+
+        private void HtmlToXaml_Click(object sender, RoutedEventArgs e)
+        {
             string output = string.Empty;
             try
             {
@@ -33,7 +38,7 @@ namespace tools
             }
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private void PreviewOnRichTextBox_Click(object sender, RoutedEventArgs e)
         {
             try
             {

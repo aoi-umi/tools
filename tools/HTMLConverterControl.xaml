@@ -15,13 +15,14 @@
     </UserControl.Resources>
     <Grid>
         <DockPanel>
-            <StackPanel DockPanel.Dock="Top">
-                <Button Margin="3" Click="Button_Click">在RichTextBox上预览</Button>
-            </StackPanel>
+            <UniformGrid Rows="1" DockPanel.Dock="Top">
+                <Button Margin="2" Click="HtmlToXaml_Click">html转xaml</Button>
+                <Button Margin="2" Click="PreviewOnRichTextBox_Click">在RichTextBox上预览</Button>
+            </UniformGrid>
             <UniformGrid Rows="2" Columns="2">
                 <DockPanel>
                     <TextBlock DockPanel.Dock="Top">html</TextBlock>
-                    <TextBox Name="HtmlBox" TextChanged="HtmlBox_TextChanged"></TextBox>
+                    <TextBox Name="HtmlBox"></TextBox>
                 </DockPanel>
                 <DockPanel>
                     <TextBlock DockPanel.Dock="Top">RichTextBox</TextBlock>
