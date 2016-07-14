@@ -129,7 +129,7 @@ namespace tools
             {
                 foreach (var s in split)
                 {
-                    var a = s.Trim().Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                    var a = s.Trim().Split(new char[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries);
                     if (a.Length < 2) throw new Exception("\r\n请按\r\narg1 int\r\narg2 int\r\n...\r\n的格式输入");
                     args += DataBasePre + a[0] + " " + a[1] + ",\r\n";
                     if ((bool)IgnoreIDBox.IsChecked && s.Trim().Split(' ')[0].ToLower() == IgnoreIdName.ToLower())
@@ -193,41 +193,56 @@ namespace tools
                 string args = "";
                 foreach (var s in split)
                 {
-                    var a = s.Trim().Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                    if (a.Length < 2) throw new Exception("\r\n请按\r\narg1 int\r\narg2 int\r\n...\r\n的格式输入");
-                    args += "[DataMember]\r\npublic ";
-                    if (a[1].ToLower().IndexOf("int") >= 0 || a[1].ToLower().IndexOf("tinyint") >= 0)
+                    var a = s.Trim().Replace(",", "").Replace("not null", "").Replace("null", "").Split(new char[] { ' ','\t' }, StringSplitOptions.RemoveEmptyEntries);
+                    if (a.Length < 2) throw new Exception("\r\n请按\r\narg1 int\r\narg2 int\r\n...\r\n或\r\n描述 arg1 int\r\n描述 arg2 int\r\n...\r\n的格式输入");
+                    string description = string.Empty;
+                    string name = string.Empty;
+                    string type = string.Empty;
+                    if (a.Length == 2)
                     {
-                        args += " int " + a[0];
-                    }
-                    else if (a[1].ToLower().IndexOf("varchar") >= 0)
-                    {
-                        args += " string " + a[0];
-                    }
-                    else if (a[1].ToLower().IndexOf("float") >= 0)
-                    {
-                        args += " double " + a[0];
-                    }
-                    else if (a[1].ToLower().IndexOf("decimal") >= 0)
-                    {
-                        args += " decimal " + a[0];
-                    }
-                    else if (a[1].ToLower().IndexOf("bit") >= 0)
-                    {
-                        args += " bool " + a[0];
-                    }
-                    else if (a[1].ToLower().IndexOf("datetime") >= 0)
-                    {
-                        args += " DateTime " + a[0];
+                        name = a[0];
+                        type = a[1].ToLower();
                     }
                     else
                     {
-                        args += " undefined " + a[0];
+                        description = a[0];
+                        name = a[1];
+                        type = a[2].ToLower();
+                    }
+                    if(!string.IsNullOrEmpty(description)) args += "/// <summary>\r\n/// " + description + "\r\n/// </summary>\r\n";
+                    args += "[DataMember]\r\npublic ";
+                    if (type.IndexOf("int") >= 0 || type.IndexOf("tinyint") >= 0)
+                    {
+                        args += " int " + name;
+                    }
+                    else if (type.IndexOf("varchar") >= 0)
+                    {
+                        args += " string " + name;
+                    }
+                    else if (type.IndexOf("float") >= 0)
+                    {
+                        args += " double " + name;
+                    }
+                    else if (type.IndexOf("decimal") >= 0)
+                    {
+                        args += " decimal " + name;
+                    }
+                    else if (type.IndexOf("bit") >= 0)
+                    {
+                        args += " bool " + name;
+                    }
+                    else if (type.IndexOf("datetime") >= 0)
+                    {
+                        args += " DateTime " + name;
+                    }
+                    else
+                    {
+                        args += " undefined " + name;
                     }
                     args += " { get; set; }\r\n\r\n";
                 }
                 var output = string.Format(modelString, ModelName, args);
-                var ignore = IgnoreCharForCSharpModelString.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                var ignore = IgnoreCharForCSharpModelString.Split(new char[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries);
                 foreach (string i in ignore)
                 {
                     output = output.Replace(i, "");
@@ -247,7 +262,7 @@ namespace tools
             {
                 foreach (var s in split)
                 {
-                    var a = s.Trim().Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                    var a = s.Trim().Split(new char[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries);
                     output += Prefix + a[0] + Suffix + "\r\n";
                 }
                 var ignore = IgnoreCharForPreAndSufString.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
