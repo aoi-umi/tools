@@ -57,6 +57,7 @@
                             <ComboBoxItem>替换字符</ComboBoxItem>
                             <ComboBoxItem>修正乱码</ComboBoxItem>
                             <ComboBoxItem>插入字符</ComboBoxItem>
+                            <ComboBoxItem>按字符分离</ComboBoxItem>
                         </ComboBox>
                         <DockPanel Name="RenameByNewNameView" Grid.Column="1">
                             <TextBlock>新文件名</TextBlock>
@@ -99,6 +100,10 @@
                             </UniformGrid>
                             <TextBox Name="InsertStringBox"></TextBox>
                         </DockPanel>
+                        <DockPanel Name="RenameBySplitStringView" Grid.Column="1" Visibility="Collapsed">
+                            <TextBlock>分隔字符串</TextBlock>
+                            <TextBox Name="SplitStringBox"></TextBox>
+                        </DockPanel>
                     </Grid>
                     <Button Content="预览" Click="Preview_Click"></Button>
                 </StackPanel>
@@ -118,6 +123,13 @@
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
+                        <GridViewColumn Header="新文件夹" Width="80">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <ContentPresenter Content="{Binding Path=NewDir}" />
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
                         <GridViewColumn Header="原文件名" Width="200">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
@@ -127,7 +139,7 @@
                         </GridViewColumn>
                         <GridViewColumn Header="新文件名" Width="200">
                             <GridViewColumn.CellTemplate>
-                            <DataTemplate>
+                                <DataTemplate>
                                         <TextBox Text="{Binding Path=NewFilename}" MinWidth="100"></TextBox>
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>

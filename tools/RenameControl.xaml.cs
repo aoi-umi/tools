@@ -8,7 +8,6 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Shapes;
 using System.Text.RegularExpressions;
 
 namespace tools
@@ -27,7 +26,7 @@ namespace tools
             AddCharset();
         }
 
-        private string Path
+        private string FilePath
         {
             get { return PathBox.Text; }
             set { if (PathBox.Text != value) PathBox.Text = value; }
@@ -56,19 +55,19 @@ namespace tools
         {
             try
             {
-                if (string.IsNullOrEmpty(Path.Trim()))
+                if (string.IsNullOrEmpty(FilePath.Trim()))
                 {
                     PathBox.Focus();
                     throw new Exception("请输入路径");
                 }
-                DirectoryInfo folder = new DirectoryInfo(Path);
+                DirectoryInfo folder = new DirectoryInfo(FilePath);
                 if (IsGetFile)
                 {
                     foreach (FileInfo CurrFile in folder.GetFiles())
                     {
                         FileList.Add(new FileInfoModel()
                         {
-                            Path = Path.EndsWith("\\") || Path.EndsWith("/") ? Path : Path + "\\",
+                            Path = FilePath.EndsWith("\\") || FilePath.EndsWith("/") ? FilePath : FilePath + "\\",
                             OldFilename = CurrFile.Name
                         });
                     }
@@ -79,7 +78,7 @@ namespace tools
                     {
                         FileList.Add(new FileInfoModel()
                         {
-                            Path = Path.EndsWith("\\") || Path.EndsWith("/") ? Path : Path + "\\",
+                            Path = FilePath.EndsWith("\\") || FilePath.EndsWith("/") ? FilePath : FilePath + "\\",
                             OldFilename = CurrFolder.Name
                         });
                     }
@@ -120,6 +119,11 @@ namespace tools
             }
         }
 
+        private void ShowMessage(string message)
+        {
+            MessageBox.Show(message);
+        }
+
         private void PreviewByNewName()
         {
             int Num = 0;
@@ -136,6 +140,8 @@ namespace tools
                 else
                     fileinfo.NewFilename = string.Format("{0}{1}{2}", NewNameBox.Text, Num.ToString("D" + NumLen), NewSuf);
                 ++Num;
+                fileinfo.IsCreateNewDir = false;
+                fileinfo.NewDir = "";
                 fileinfo.Status = "";
             }
         }
@@ -147,6 +153,8 @@ namespace tools
                 foreach (var fileinfo in FileList)
                 {
                     fileinfo.NewFilename = Regex.Replace(fileinfo.OldFilename, OldStringBox.Text, NewStringBox.Text);
+                    fileinfo.IsCreateNewDir = false;
+                    fileinfo.NewDir = "";
                     fileinfo.Status = "";
                 }
             }
@@ -164,6 +172,8 @@ namespace tools
             foreach (var fileinfo in FileList)
             {
                 fileinfo.NewFilename = encoding.GetString(defaultEncoding.GetBytes(fileinfo.OldFilename));
+                fileinfo.IsCreateNewDir = false;
+                fileinfo.NewDir = "";
                 fileinfo.Status = "";
             }
         }
@@ -181,6 +191,8 @@ namespace tools
                 if (InsertIndex > Name.Length) TrueInsertIndex = Name.Length;
                 else if (InsertIndex < 0) TrueInsertIndex = Name.Length + InsertIndex < 0 ? 0 : Name.Length + InsertIndex;
                 fileinfo.NewFilename = Name.Insert(TrueInsertIndex, InsertStringBox.Text) + Suf;
+                fileinfo.IsCreateNewDir = false;
+                fileinfo.NewDir = "";
                 fileinfo.Status = "";
             }
         }
@@ -190,13 +202,31 @@ namespace tools
             foreach (var fileinfo in FileList)
             {
                 fileinfo.NewFilename = "";
+                fileinfo.IsCreateNewDir = false;
+                fileinfo.NewDir = "";
                 fileinfo.Status = "";
             }
         }
 
-        private void ShowMessage(string message)
+        private void PreviewBySplitString()
         {
-            MessageBox.Show(message);
+            string splitString = SplitStringBox.Text;
+            if (string.IsNullOrEmpty(splitString)) throw new Exception("请输入分隔字符串");
+            foreach (var fileinfo in FileList)
+            {
+                int lastIndex = fileinfo.OldFilename.LastIndexOf(splitString);
+                if (lastIndex >= 0)
+                {
+                    fileinfo.NewFilename = fileinfo.OldFilename.Substring(lastIndex + 1);
+                    fileinfo.IsCreateNewDir = true;
+                    fileinfo.NewDir = fileinfo.OldFilename.Substring(0, lastIndex).Replace(splitString, @"\");
+                }
+                else
+                {
+                    fileinfo.NewFilename = fileinfo.OldFilename;
+                }
+                fileinfo.Status = "";
+            }
         }
 
         #region 事件
@@ -248,12 +278,20 @@ namespace tools
                         CurrView.Visibility = Visibility.Visible;
                     }
                     break;
+                case 4:
+                    if (CurrView != RenameBySplitStringView)
+                    {
+                        CurrView.Visibility = Visibility.Collapsed;
+                        CurrView = RenameBySplitStringView;
+                        CurrView.Visibility = Visibility.Visible;
+                    }
+                    break;
             }
         }
 
         private void PathBox_PreviewDrop(object sender, DragEventArgs e)
         {
-            Path = ((Array)e.Data.GetData(DataFormats.FileDrop)).GetValue(0).ToString();
+            FilePath = ((Array)e.Data.GetData(DataFormats.FileDrop)).GetValue(0).ToString();
         }
 
         private void PathBox_PreviewDragOver(object sender, DragEventArgs e)
@@ -282,6 +320,9 @@ namespace tools
                     case 3:
                         PreviewByInsert();
                         break;
+                    case 4:
+                        PreviewBySplitString();
+                        break;
                     default:
                         PreviewByResetName();
                         break;
@@ -308,7 +349,14 @@ namespace tools
                 try
                 {
                     if (string.IsNullOrEmpty(fileinfo.NewFilename)) throw new Exception("新文件名不能为空");
-                    File.Move(fileinfo.Path + fileinfo.OldFilename, fileinfo.Path + fileinfo.NewFilename);
+                    if(fileinfo.IsCreateNewDir && !string.IsNullOrEmpty(fileinfo.NewDir))
+                    {
+                        string NewPath = Path.Combine(fileinfo.Path, fileinfo.NewDir);
+                        Directory.CreateDirectory(NewPath);
+                        File.Move(Path.Combine(fileinfo.Path, fileinfo.OldFilename), Path.Combine(NewPath, fileinfo.NewFilename));
+                    }
+                    else if (fileinfo.OldFilename != fileinfo.NewFilename)
+                        File.Move(Path.Combine(fileinfo.Path, fileinfo.OldFilename), Path.Combine(fileinfo.Path, fileinfo.NewFilename));
                     ++SuccessNum;
                     fileinfo.IsSuccess = true;
                     fileinfo.Status = "修改成功";
@@ -323,7 +371,14 @@ namespace tools
                     try
                     {
                         if (string.IsNullOrEmpty(fileinfo.NewFilename)) throw new Exception("新文件名不能为空");
-                        Directory.Move(fileinfo.Path + fileinfo.OldFilename, fileinfo.Path + fileinfo.NewFilename);
+                        if (fileinfo.IsCreateNewDir && !string.IsNullOrEmpty(fileinfo.NewDir))
+                        {
+                            string NewPath = Path.Combine(fileinfo.Path, fileinfo.NewDir);
+                            Directory.CreateDirectory(NewPath);
+                            Directory.Move(Path.Combine(fileinfo.Path, fileinfo.OldFilename), Path.Combine(NewPath, fileinfo.NewFilename));
+                        }
+                        else if (fileinfo.OldFilename != fileinfo.NewFilename)
+                            Directory.Move(Path.Combine(fileinfo.Path, fileinfo.OldFilename), Path.Combine(fileinfo.Path, fileinfo.NewFilename));
                         ++SuccessNum;
                         fileinfo.IsSuccess = true;
                         fileinfo.Status = "修改成功";
@@ -387,6 +442,12 @@ namespace tools
 
         public string OldFilename { get; set; }
 
+        public string NewDir
+        {
+            get { return _NewDir; }
+            set { if (_NewDir != value) { _NewDir = value; MyPropertyChanged("NewDir"); } }
+        }
+
         public string NewFilename
         {
             get { return _NewFilename; }
@@ -399,6 +460,8 @@ namespace tools
             set { if (_Status != value) { _Status = value; MyPropertyChanged("Status"); } }
         }
 
+        public bool IsCreateNewDir { get; set; }
+
         public bool IsSuccess
         {
             get { return _IsSuccess; }
@@ -407,16 +470,14 @@ namespace tools
 
         public event PropertyChangedEventHandler PropertyChanged;
 
+        private string _NewDir { get; set; }
         private string _NewFilename { get; set; }
         private string _Status { get; set; }
         private bool _IsSuccess { get; set; }
 
         private void MyPropertyChanged(string name)
         {
-            if (PropertyChanged != null)
-            {
-                PropertyChanged(this, new PropertyChangedEventArgs(name));
-            }
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
     }
 
