@@ -42,6 +42,7 @@
                     <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal">
                         <CheckBox Name="IsGetFileBox" Content="获取文件" IsChecked="True"></CheckBox>
                         <CheckBox Name="IsGetFolderBox" Content="获取文件夹"></CheckBox>
+                        <CheckBox Name="IsGetChildDirBox">包括子文件夹</CheckBox>
                     </StackPanel>
                 </Grid>
             </GroupBox>

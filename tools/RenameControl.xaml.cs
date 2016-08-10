@@ -42,6 +42,11 @@ namespace tools
             get { return (bool)IsGetFolderBox.IsChecked; } 
         }
 
+        private bool IsGetChildDir
+        {
+            get { return (bool)IsGetChildDirBox.IsChecked; }
+        }
+
         private string StatusMessage
         {
             set { StatusMessageBox.Text = value + " (" + DateTime.Now + ")"; }
@@ -51,44 +56,39 @@ namespace tools
 
         private ObservableCollection<FileInfoModel> FileList { get; set; }
 
-        private void GetFileList()
-        {
-            try
+        private void GetFileList(string path)
+        {            
+            DirectoryInfo folder = new DirectoryInfo(path);
+            if (IsGetChildDir)
             {
-                if (string.IsNullOrEmpty(FilePath.Trim()))
+                foreach (DirectoryInfo CurrFolder in folder.GetDirectories())
                 {
-                    PathBox.Focus();
-                    throw new Exception("请输入路径");
+                    GetFileList(CurrFolder.FullName);
                 }
-                DirectoryInfo folder = new DirectoryInfo(FilePath);
-                if (IsGetFile)
-                {
-                    foreach (FileInfo CurrFile in folder.GetFiles())
-                    {
-                        FileList.Add(new FileInfoModel()
-                        {
-                            Path = FilePath.EndsWith("\\") || FilePath.EndsWith("/") ? FilePath : FilePath + "\\",
-                            OldFilename = CurrFile.Name
-                        });
-                    }
-                }
-                if (IsGetFolder)
-                {
-                    foreach (DirectoryInfo CurrFolder in folder.GetDirectories())
-                    {
-                        FileList.Add(new FileInfoModel()
-                        {
-                            Path = FilePath.EndsWith("\\") || FilePath.EndsWith("/") ? FilePath : FilePath + "\\",
-                            OldFilename = CurrFolder.Name
-                        });
-                    }
-                }
-                StatusMessage = "文件数：" + FileList.Count;                
             }
-            catch (Exception ex)
+            if (IsGetFile)
             {
-                ShowMessage(ex.Message);
+                foreach (FileInfo CurrFile in folder.GetFiles())
+                {
+                    FileList.Add(new FileInfoModel()
+                    {
+                        Path = CurrFile.DirectoryName,
+                        OldFilename = CurrFile.Name
+                    });
+                }
             }
+            if (IsGetFolder)
+            {
+                foreach (DirectoryInfo CurrFolder in folder.GetDirectories())
+                {
+                    FileList.Add(new FileInfoModel()
+                    {
+                        Path = CurrFolder.Parent.FullName,
+                        OldFilename = CurrFolder.Name
+                    });
+                }
+            }
+            StatusMessage = "文件数：" + FileList.Count;
         }
 
         private string GetSuf(string str)
@@ -232,14 +232,38 @@ namespace tools
         #region 事件
         private void GetFileList_Click(object sender, RoutedEventArgs e)
         {
-            GetFileList();
+            try
+            {
+                if (string.IsNullOrEmpty(FilePath.Trim()))
+                {
+                    PathBox.Focus();
+                    throw new Exception("请输入路径");
+                }
+                GetFileList(FilePath);
+            }
+            catch (Exception ex)
+            {
+                ShowMessage(ex.Message);
+            }
         }
 
         private void GetFileListAfterClear_Click(object sender, RoutedEventArgs e)
         {
             if (FileList.Count > 0)
                 FileList.Clear();
-            GetFileList();
+            try
+            {
+                if (string.IsNullOrEmpty(FilePath.Trim()))
+                {
+                    PathBox.Focus();
+                    throw new Exception("请输入路径");
+                }
+                GetFileList(FilePath);
+            }
+            catch (Exception ex)
+            {
+                ShowMessage(ex.Message);
+            }
         }
 
         private void RenameSelectBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
