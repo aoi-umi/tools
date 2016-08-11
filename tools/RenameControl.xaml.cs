@@ -20,16 +20,33 @@ namespace tools
         public RenameControl()
         {
             InitializeComponent();
+            bgWorker = new BackgroundWorker();
             FileList = new ObservableCollection<FileInfoModel>();
+
+            bgWorker.DoWork += BgWorker_DoWork;
+            bgWorker.RunWorkerCompleted += BgWorker_RunWorkerCompleted;
             FileListView.ItemsSource = FileList;
             CurrView = RenameByNewNameView;
             AddCharset();
         }
 
+        private BackgroundWorker bgWorker { get; set; }
+
         private string FilePath
         {
             get { return PathBox.Text; }
             set { if (PathBox.Text != value) PathBox.Text = value; }
+        }
+
+        private string FilterString
+        {
+            get { return FilterBox.Text; }
+            set { if (FilterBox.Text != value) FilterBox.Text = value; }
+        }
+
+        private bool IsGetMatch
+        {
+            get { return (bool)IsGetMatchBox.IsChecked; }
         }
 
         private bool IsGetFile
@@ -70,6 +87,11 @@ namespace tools
             {
                 foreach (FileInfo CurrFile in folder.GetFiles())
                 {
+                    if (!string.IsNullOrEmpty(FilterString))
+                    {
+                        bool match = Regex.IsMatch(CurrFile.Name, FilterString);
+                        if ((IsGetMatch && !match) || (!IsGetMatch && match)) continue;
+                    }
                     FileList.Add(new FileInfoModel()
                     {
                         Path = CurrFile.DirectoryName,
@@ -81,6 +103,10 @@ namespace tools
             {
                 foreach (DirectoryInfo CurrFolder in folder.GetDirectories())
                 {
+                    if (!string.IsNullOrEmpty(FilterString))
+                    {
+                        if (Regex.IsMatch(CurrFolder.Name, FilterString)) continue;
+                    }
                     FileList.Add(new FileInfoModel()
                     {
                         Path = CurrFolder.Parent.FullName,
@@ -229,6 +255,58 @@ namespace tools
             }
         }
 
+        private int Rename()
+        {
+            int SuccessNum = 0;
+            foreach (var fileinfo in FileList)
+            {
+                try
+                {
+                    if (string.IsNullOrEmpty(fileinfo.NewFilename)) throw new Exception("新文件名不能为空");
+                    if (fileinfo.IsCreateNewDir && !string.IsNullOrEmpty(fileinfo.NewDir))
+                    {
+                        string NewPath = Path.Combine(fileinfo.Path, fileinfo.NewDir);
+                        Directory.CreateDirectory(NewPath);
+                        File.Move(Path.Combine(fileinfo.Path, fileinfo.OldFilename), Path.Combine(NewPath, fileinfo.NewFilename));
+                    }
+                    else if (fileinfo.OldFilename != fileinfo.NewFilename)
+                        File.Move(Path.Combine(fileinfo.Path, fileinfo.OldFilename), Path.Combine(fileinfo.Path, fileinfo.NewFilename));
+                    ++SuccessNum;
+                    fileinfo.IsSuccess = true;
+                    fileinfo.Status = "修改成功";
+                }
+                catch (Exception ex)
+                {
+                    fileinfo.IsSuccess = false;
+                    fileinfo.Status = ex.Message.Trim();
+                }
+                if (!fileinfo.IsSuccess)
+                {
+                    try
+                    {
+                        if (string.IsNullOrEmpty(fileinfo.NewFilename)) throw new Exception("新文件名不能为空");
+                        if (fileinfo.IsCreateNewDir && !string.IsNullOrEmpty(fileinfo.NewDir))
+                        {
+                            string NewPath = Path.Combine(fileinfo.Path, fileinfo.NewDir);
+                            Directory.CreateDirectory(NewPath);
+                            Directory.Move(Path.Combine(fileinfo.Path, fileinfo.OldFilename), Path.Combine(NewPath, fileinfo.NewFilename));
+                        }
+                        else if (fileinfo.OldFilename != fileinfo.NewFilename)
+                            Directory.Move(Path.Combine(fileinfo.Path, fileinfo.OldFilename), Path.Combine(fileinfo.Path, fileinfo.NewFilename));
+                        ++SuccessNum;
+                        fileinfo.IsSuccess = true;
+                        fileinfo.Status = "修改成功";
+                    }
+                    catch (Exception ex)
+                    {
+                        fileinfo.IsSuccess = false;
+                        fileinfo.Status = ex.Message.Trim();
+                    }
+                }
+            }
+            return SuccessNum;
+        }
+
         #region 事件
         private void GetFileList_Click(object sender, RoutedEventArgs e)
         {
@@ -367,54 +445,11 @@ namespace tools
 
         private void Rename_Click(object sender, RoutedEventArgs e)
         {
-            int SuccessNum = 0;
-            foreach (var fileinfo in FileList)
+            if (!bgWorker.IsBusy)
             {
-                try
-                {
-                    if (string.IsNullOrEmpty(fileinfo.NewFilename)) throw new Exception("新文件名不能为空");
-                    if(fileinfo.IsCreateNewDir && !string.IsNullOrEmpty(fileinfo.NewDir))
-                    {
-                        string NewPath = Path.Combine(fileinfo.Path, fileinfo.NewDir);
-                        Directory.CreateDirectory(NewPath);
-                        File.Move(Path.Combine(fileinfo.Path, fileinfo.OldFilename), Path.Combine(NewPath, fileinfo.NewFilename));
-                    }
-                    else if (fileinfo.OldFilename != fileinfo.NewFilename)
-                        File.Move(Path.Combine(fileinfo.Path, fileinfo.OldFilename), Path.Combine(fileinfo.Path, fileinfo.NewFilename));
-                    ++SuccessNum;
-                    fileinfo.IsSuccess = true;
-                    fileinfo.Status = "修改成功";
-                }
-                catch (Exception ex)
-                {
-                    fileinfo.IsSuccess = false;
-                    fileinfo.Status = ex.Message.Trim();
-                }
-                if (!fileinfo.IsSuccess)
-                {
-                    try
-                    {
-                        if (string.IsNullOrEmpty(fileinfo.NewFilename)) throw new Exception("新文件名不能为空");
-                        if (fileinfo.IsCreateNewDir && !string.IsNullOrEmpty(fileinfo.NewDir))
-                        {
-                            string NewPath = Path.Combine(fileinfo.Path, fileinfo.NewDir);
-                            Directory.CreateDirectory(NewPath);
-                            Directory.Move(Path.Combine(fileinfo.Path, fileinfo.OldFilename), Path.Combine(NewPath, fileinfo.NewFilename));
-                        }
-                        else if (fileinfo.OldFilename != fileinfo.NewFilename)
-                            Directory.Move(Path.Combine(fileinfo.Path, fileinfo.OldFilename), Path.Combine(fileinfo.Path, fileinfo.NewFilename));
-                        ++SuccessNum;
-                        fileinfo.IsSuccess = true;
-                        fileinfo.Status = "修改成功";
-                    }
-                    catch (Exception ex)
-                    {
-                        fileinfo.IsSuccess = false;
-                        fileinfo.Status = ex.Message.Trim();
-                    }
-                }
+                IsEnabled = false;
+                bgWorker.RunWorkerAsync();
             }
-            StatusMessage = string.Format("修改完毕：{0}/{1}", SuccessNum, FileList.Count);
         }
 
         private void FileListView_Drop(object sender, DragEventArgs e)
@@ -451,7 +486,19 @@ namespace tools
                 }                
             }
         }
-        
+
+        private void BgWorker_DoWork(object sender, DoWorkEventArgs e)
+        {
+            int successNum = Rename();
+            e.Result = successNum;
+            BackgroundWorker worker = sender as BackgroundWorker;            
+        }
+
+        private void BgWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            IsEnabled = true;
+            StatusMessage = string.Format("修改完毕：{0}/{1}", e.Result, FileList.Count);
+        }
         #endregion
 
     }

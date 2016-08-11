@@ -19,12 +19,16 @@
             <Setter Property="VerticalAlignment" Value="Center"></Setter>
             <Setter Property="Margin" Value="5,0"></Setter>
         </Style>
+        <Style TargetType="TextBox">
+            <Setter Property="Margin" Value="0,1"></Setter>
+        </Style>
     </UserControl.Resources>
     <Grid>
         <DockPanel>
             <GroupBox Header="从文件夹获取" DockPanel.Dock="Top">
                 <Grid>
                     <Grid.RowDefinitions>
+                        <RowDefinition></RowDefinition>
                         <RowDefinition></RowDefinition>
                         <RowDefinition></RowDefinition>
                     </Grid.RowDefinitions>
@@ -39,7 +43,10 @@
                         <Button Click="GetFileList_Click">获取</Button>
                         <Button Click="GetFileListAfterClear_Click">清除并获取</Button>
                     </UniformGrid>
-                    <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal">
+                    <TextBlock Grid.Row="1" Text="过滤"></TextBlock>
+                    <TextBox Grid.Row="1" Grid.Column="1" Name="FilterBox"></TextBox>
+                    <CheckBox Name="IsGetMatchBox" Grid.Row="1" Grid.Column="2" >获取匹配</CheckBox>
+                    <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal" Margin="0,4,0,0">
                         <CheckBox Name="IsGetFileBox" Content="获取文件" IsChecked="True"></CheckBox>
                         <CheckBox Name="IsGetFolderBox" Content="获取文件夹"></CheckBox>
                         <CheckBox Name="IsGetChildDirBox">包括子文件夹</CheckBox>
