@@ -263,14 +263,33 @@ namespace tools
                 try
                 {
                     if (string.IsNullOrEmpty(fileinfo.NewFilename)) throw new Exception("新文件名不能为空");
-                    if (fileinfo.IsCreateNewDir && !string.IsNullOrEmpty(fileinfo.NewDir))
+                    string OldFullName = Path.Combine(fileinfo.Path, fileinfo.OldFilename);
+                    if (File.Exists(OldFullName))
                     {
-                        string NewPath = Path.Combine(fileinfo.Path, fileinfo.NewDir);
-                        Directory.CreateDirectory(NewPath);
-                        File.Move(Path.Combine(fileinfo.Path, fileinfo.OldFilename), Path.Combine(NewPath, fileinfo.NewFilename));
+                        if (fileinfo.IsCreateNewDir && !string.IsNullOrEmpty(fileinfo.NewDir))
+                        {
+                            string NewPath = Path.Combine(fileinfo.Path, fileinfo.NewDir);
+                            Directory.CreateDirectory(NewPath);
+                            File.Move(OldFullName, Path.Combine(NewPath, fileinfo.NewFilename));
+                        }
+                        else if (fileinfo.OldFilename != fileinfo.NewFilename)
+                            File.Move(OldFullName, Path.Combine(fileinfo.Path, fileinfo.NewFilename));
                     }
-                    else if (fileinfo.OldFilename != fileinfo.NewFilename)
-                        File.Move(Path.Combine(fileinfo.Path, fileinfo.OldFilename), Path.Combine(fileinfo.Path, fileinfo.NewFilename));
+                    else if (Directory.Exists(OldFullName))
+                    {
+                        if (fileinfo.IsCreateNewDir && !string.IsNullOrEmpty(fileinfo.NewDir))
+                        {
+                            string NewPath = Path.Combine(fileinfo.Path, fileinfo.NewDir);
+                            Directory.CreateDirectory(NewPath);
+                            Directory.Move(OldFullName, Path.Combine(NewPath, fileinfo.NewFilename));
+                        }
+                        else if (fileinfo.OldFilename != fileinfo.NewFilename)
+                            Directory.Move(OldFullName, Path.Combine(fileinfo.Path, fileinfo.NewFilename));
+                    }
+                    else
+                    {
+                        throw new Exception($"无效路径，不存在文件{OldFullName}");
+                    }
                     ++SuccessNum;
                     fileinfo.IsSuccess = true;
                     fileinfo.Status = "修改成功";
@@ -280,29 +299,7 @@ namespace tools
                     fileinfo.IsSuccess = false;
                     fileinfo.Status = ex.Message.Trim();
                 }
-                if (!fileinfo.IsSuccess)
-                {
-                    try
-                    {
-                        if (string.IsNullOrEmpty(fileinfo.NewFilename)) throw new Exception("新文件名不能为空");
-                        if (fileinfo.IsCreateNewDir && !string.IsNullOrEmpty(fileinfo.NewDir))
-                        {
-                            string NewPath = Path.Combine(fileinfo.Path, fileinfo.NewDir);
-                            Directory.CreateDirectory(NewPath);
-                            Directory.Move(Path.Combine(fileinfo.Path, fileinfo.OldFilename), Path.Combine(NewPath, fileinfo.NewFilename));
-                        }
-                        else if (fileinfo.OldFilename != fileinfo.NewFilename)
-                            Directory.Move(Path.Combine(fileinfo.Path, fileinfo.OldFilename), Path.Combine(fileinfo.Path, fileinfo.NewFilename));
-                        ++SuccessNum;
-                        fileinfo.IsSuccess = true;
-                        fileinfo.Status = "修改成功";
-                    }
-                    catch (Exception ex)
-                    {
-                        fileinfo.IsSuccess = false;
-                        fileinfo.Status = ex.Message.Trim();
-                    }
-                }
+
             }
             return SuccessNum;
         }
