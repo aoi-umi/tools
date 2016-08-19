@@ -77,13 +77,36 @@
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="65"></ColumnDefinition>
                                 <ColumnDefinition Width="*"></ColumnDefinition>
+                                <ColumnDefinition Width="65"></ColumnDefinition>
+                                <ColumnDefinition Width="*"></ColumnDefinition>
                             </Grid.ColumnDefinitions>
                             <TextBlock Grid.Row="0" Grid.Column="0">前缀</TextBlock>
                             <TextBox Grid.Row="0" Grid.Column="1" Name="Pre"></TextBox>
-                            <TextBlock Grid.Row="1" Grid.Column="0">后缀</TextBlock>
-                            <TextBox Grid.Row="1" Grid.Column="1" Name="Suf"></TextBox>
+                            <TextBlock Grid.Row="0" Grid.Column="2">后缀</TextBlock>
+                            <TextBox Grid.Row="0" Grid.Column="3" Name="Suf"></TextBox>
+                            <TextBlock Grid.Row="1" Grid.Column="0">去除字符串</TextBlock>
+                            <TextBox Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="3" Name="IgnoreCharForPreAndSuf">" @</TextBox>                      
+                        </Grid>
+                    </TabItem>
+                    <TabItem Header="按字符串切割" Name="SplitString">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition></RowDefinition>
+                                <RowDefinition></RowDefinition>
+                                <RowDefinition></RowDefinition>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="65"></ColumnDefinition>
+                                <ColumnDefinition Width="*"></ColumnDefinition>
+                                <ColumnDefinition Width="65"></ColumnDefinition>
+                                <ColumnDefinition Width="*"></ColumnDefinition>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Row="0" Grid.Column="0">分割字符串</TextBlock>
+                            <TextBox Grid.Row="0" Grid.Column="1" Name="SplitBox" Text=" "></TextBox>
+                            <TextBlock Grid.Row="0" Grid.Column="2">获取列</TextBlock>
+                            <TextBox Grid.Row="0" Grid.Column="3" Name="SplitColumnNum" Text="1"></TextBox>
                             <TextBlock Grid.Row="2" Grid.Column="0">去除字符串</TextBlock>
-                            <TextBox Grid.Row="2" Grid.Column="1" Name="IgnoreCharForPreAndSuf">" @</TextBox>                      
+                            <TextBox Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="3" Name="IgnoreCharForSplit"></TextBox>
                         </Grid>
                     </TabItem>
                     <TabItem Header="替换字符串" Name="RegReplaceString">

@@ -4,6 +4,7 @@ using System.Windows.Controls;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 using System.IO;
+using System.Collections.Generic;
 
 namespace tools
 {
@@ -69,6 +70,11 @@ namespace tools
             get { return IgnoreCharForPreAndSuf.Text; }
         }
 
+        private string IgnoreCharForSplitString
+        {
+            get { return IgnoreCharForSplit.Text; }
+        }
+
         private string Prefix
         {
             get { return Pre.Text; }
@@ -77,7 +83,7 @@ namespace tools
         private string Suffix
         {
             get { return Suf.Text; }
-        }
+        }        
 
         private void MakeButton_Click(object sender, RoutedEventArgs e)
         {
@@ -96,11 +102,14 @@ namespace tools
                     case "AddPreAndSuf":
                         OutputString = ForAddPreAndSuf(split);
                         break;
+                    case "SplitString":
+                        OutputString = ForSplitString(split);
+                        break;
                     case "RegReplaceString": 
-                        OutputString = ReplaceString(InputString);
+                        OutputString = ForReplaceString(InputString);
                         break;
                     case "JsonBeautify":
-                        OutputString = BeautifyJsonString(InputString);
+                        OutputString = ForBeautifyJsonString(InputString);
                         break;
                 }
             }
@@ -262,8 +271,8 @@ namespace tools
             {
                 foreach (var s in split)
                 {
-                    var a = s.Trim().Split(new char[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries);
-                    output += Prefix + a[0] + Suffix + "\r\n";
+                    //var a = s.Trim().Split(new char[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries);
+                    output += Prefix + s.Trim() + Suffix + "\r\n";
                 }
                 var ignore = IgnoreCharForPreAndSufString.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
                 foreach (string i in ignore)
@@ -278,7 +287,33 @@ namespace tools
             }
         }
 
-        private string ReplaceString(string input)
+        private string ForSplitString(string[] split)
+        {
+            string output = string.Empty;
+            try
+            {
+                int splitColumnNum = int.Parse(SplitColumnNum.Text);
+                if (splitColumnNum <= 0) throw new Exception("列数请输入大于0的数字");
+                foreach (var s in split)
+                {
+                    var a = s.Trim().Split(new string[] { SplitBox.Text }, StringSplitOptions.RemoveEmptyEntries);
+                    if(a.Length >= splitColumnNum)
+                        output += a[splitColumnNum - 1] + "\r\n";
+                }
+                var ignore = IgnoreCharForSplitString.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                foreach (string i in ignore)
+                {
+                    output = output.Replace(i, "");
+                }
+                return output;
+            }
+            catch (Exception ex)
+            {
+                return ex.ToString();
+            }
+        }
+
+        private string ForReplaceString(string input)
         {
             string output = string.Empty;
             try
@@ -291,7 +326,7 @@ namespace tools
             }
         }
 
-        private string BeautifyJsonString(string input)
+        private string ForBeautifyJsonString(string input)
         {
             try
             {
