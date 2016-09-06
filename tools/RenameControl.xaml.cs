@@ -304,7 +304,7 @@ namespace tools
             return SuccessNum;
         }
 
-        #region 事件
+        #region event
         private void GetFileList_Click(object sender, RoutedEventArgs e)
         {
             try
@@ -451,19 +451,34 @@ namespace tools
 
         private void FileListView_Drop(object sender, DragEventArgs e)
         {
-            Array list = e.Data.GetData(DataFormats.FileDrop) as Array;
-            foreach (var l in list)
+            if (isDragingItem)
             {
-                string s = l as string;
-                if (!string.IsNullOrEmpty(s))
+                isDragingItem = false;
+                int index = GetCurrentIndex(FileListView, e.GetPosition);
+                if (FileListView.SelectedItems.Count > 0 && index >= 0 && index != FileList.IndexOf(FileListView.SelectedItems[0] as FileInfoModel))
                 {
-                    int index = s.LastIndexOf("\\");
-                    FileInfoModel model = new FileInfoModel()
+                    foreach (FileInfoModel item in FileListView.SelectedItems)
                     {
-                        Path = s.Substring(0, index + 1),
-                        OldFilename = s.Substring(index + 1)
-                    };
-                    FileList.Add(model);
+                        FileList.Move(FileList.IndexOf(item), index);
+                    }
+                }
+            }
+            else
+            {
+                Array list = e.Data.GetData(DataFormats.FileDrop) as Array;
+                foreach (var l in list)
+                {
+                    string s = l as string;
+                    if (!string.IsNullOrEmpty(s))
+                    {
+                        int index = s.LastIndexOf("\\");
+                        FileInfoModel model = new FileInfoModel()
+                        {
+                            Path = s.Substring(0, index + 1),
+                            OldFilename = s.Substring(index + 1)
+                        };
+                        FileList.Add(model);
+                    }
                 }
             }
             StatusMessage = "文件数：" + FileList.Count;  
@@ -484,6 +499,16 @@ namespace tools
             }
         }
 
+        bool isDragingItem = false;
+        private void FileListView_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (!isDragingItem && e.LeftButton == MouseButtonState.Pressed)
+            {
+                isDragingItem = true;
+                DragDrop.DoDragDrop(FileListView, FileListView.SelectedItems, DragDropEffects.Move);
+            }
+        }
+
         private void BgWorker_DoWork(object sender, DoWorkEventArgs e)
         {
             int successNum = Rename();
@@ -498,6 +523,30 @@ namespace tools
         }
         #endregion
 
+        #region drag listview item
+        private delegate Point GetPositionDelegate(IInputElement element);
+        private int GetCurrentIndex(ListView lv, GetPositionDelegate getPosition)
+        {
+            int index = -1;
+            for (int i = 0; i < lv.Items.Count; ++i)
+            {
+                ListViewItem item = lv.ItemContainerGenerator.ContainerFromIndex(i) as ListViewItem;
+                if (IsMouseOverTarget(item, getPosition))
+                {
+                    index = i;
+                    break;
+                }
+            }
+            return index;
+        }
+
+        private bool IsMouseOverTarget(Visual target, GetPositionDelegate getPosition)
+        {
+            Rect bounds = VisualTreeHelper.GetDescendantBounds(target);
+            Point mousePos = getPosition((IInputElement)target);
+            return bounds.Contains(mousePos);
+        }
+        #endregion
     }
 
     public class FileInfoModel : INotifyPropertyChanged

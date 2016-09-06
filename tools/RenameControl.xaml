@@ -121,7 +121,7 @@
                 <Button Click="Rename_Click">重命名</Button>
                 <Button Click="Clear_Click">清除</Button>
             </UniformGrid>
-            <ListView Name="FileListView" Drop="FileListView_Drop" AllowDrop="True" KeyUp="FileListView_KeyUp">
+            <ListView Name="FileListView" AllowDrop="True" Drop="FileListView_Drop" KeyUp="FileListView_KeyUp" MouseMove="FileListView_MouseMove">
                 <ListView.View>                    
                     <GridView>
                         <GridViewColumn Header="路径" Width="80">
