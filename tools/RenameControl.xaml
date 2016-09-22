@@ -138,13 +138,7 @@
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
-                        <GridViewColumn Header="原文件名" Width="200">
-                            <GridViewColumn.CellTemplate>
-                                <DataTemplate>
-                                    <ContentPresenter Content="{Binding Path=OldFilename}" />
-                                </DataTemplate>
-                            </GridViewColumn.CellTemplate>
-                        </GridViewColumn>
+                        <GridViewColumn Header="原文件名" Width="200" DisplayMemberBinding="{Binding Path=OldFilename}"/>
                         <GridViewColumn Header="新文件名" Width="200">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
