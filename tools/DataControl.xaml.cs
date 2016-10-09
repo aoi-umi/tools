@@ -318,7 +318,7 @@ namespace tools
             string output = string.Empty;
             try
             {
-                return Regex.Replace(input, OldStringBox.Text, NewStringBox.Text);
+                return Regex.Replace(input, OldStringBox.Text, Regex.Unescape(NewStringBox.Text));
             }
             catch (Exception ex)
             {
