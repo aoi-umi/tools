@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="tools.RegexControl"
+﻿<UserControl xmlns:local="clr-namespace:tools"  x:Class="tools.RegexControl"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -23,7 +23,7 @@
                 <TextBox Name="RegexBox"  TextChanged="Input_TextChanged" AcceptsReturn="False" AcceptsTab="False"/>
             </DockPanel>
             <Border Margin="5,15,0,0" BorderThickness="1" BorderBrush="Gray">
-                <WebBrowser Name="MatchBox"></WebBrowser>
+                <local:SearchableTextControl x:Name="MatchBox"/>
             </Border>
         </UniformGrid>
     </Grid>

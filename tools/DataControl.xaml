@@ -7,16 +7,16 @@
              d:DesignHeight="450" d:DesignWidth="700">
     <UserControl.Resources>
         <Style TargetType="TextBlock">
-            <Setter Property="VerticalAlignment" Value="Center"></Setter>
-            <Setter Property="HorizontalAlignment" Value="Left"></Setter>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="HorizontalAlignment" Value="Left"/>
         </Style>
         <Style TargetType="TextBox">
-            <Setter Property="Margin" Value="0,2"></Setter>
-            <Setter Property="VerticalScrollBarVisibility" Value="Auto"></Setter>
+            <Setter Property="Margin" Value="0,2"/>
+            <Setter Property="VerticalScrollBarVisibility" Value="Auto"/>
         </Style>
         <Style TargetType="CheckBox">
-            <Setter Property="VerticalAlignment" Value="Center"></Setter>
-            <Setter Property="HorizontalAlignment" Value="Left"></Setter>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="HorizontalAlignment" Value="Left"/>
         </Style>
     </UserControl.Resources>
     <Grid>
@@ -26,15 +26,15 @@
                     <TabItem Header="存储过程" Name="Procedure">
                         <Grid>
                             <Grid.RowDefinitions>
-                                <RowDefinition></RowDefinition>
-                                <RowDefinition></RowDefinition>
-                                <RowDefinition></RowDefinition>
-                                <RowDefinition></RowDefinition>
-                                <RowDefinition></RowDefinition>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                                <RowDefinition/>
                             </Grid.RowDefinitions>
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="65"></ColumnDefinition>
-                                <ColumnDefinition Width="*"></ColumnDefinition>
+                                <ColumnDefinition Width="65"/>
+                                <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
                             <CheckBox Grid.Row="0" Grid.Column="0" Name="UpdateBox">update</CheckBox>
                             <ComboBox Grid.Row="0" Grid.Column="1" Name="DataBaseBox" SelectedIndex="0" IsEditable="True">
@@ -54,12 +54,12 @@
                     <TabItem Header="C#模型" Name="CSharpModel">
                         <Grid>
                             <Grid.RowDefinitions>
-                                <RowDefinition></RowDefinition>
-                                <RowDefinition></RowDefinition>
+                                <RowDefinition/>
+                                <RowDefinition/>
                             </Grid.RowDefinitions>
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="65"></ColumnDefinition>
-                                <ColumnDefinition Width="*"></ColumnDefinition>
+                                <ColumnDefinition Width="65"/>
+                                <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
                             <TextBlock Grid.Row="0" Grid.Column="0">Model名</TextBlock>
                             <TextBox Grid.Row="0" Grid.Column="1"  Name="ModelBox"></TextBox>
@@ -70,15 +70,15 @@
                     <TabItem Header="增加前缀后缀" Name="AddPreAndSuf">
                         <Grid>
                             <Grid.RowDefinitions>
-                                <RowDefinition></RowDefinition>
-                                <RowDefinition></RowDefinition>
-                                <RowDefinition></RowDefinition>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                                <RowDefinition/>
                             </Grid.RowDefinitions>
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="65"></ColumnDefinition>
-                                <ColumnDefinition Width="*"></ColumnDefinition>
-                                <ColumnDefinition Width="65"></ColumnDefinition>
-                                <ColumnDefinition Width="*"></ColumnDefinition>
+                                <ColumnDefinition Width="65"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="65"/>
+                                <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
                             <TextBlock Grid.Row="0" Grid.Column="0">前缀</TextBlock>
                             <TextBox Grid.Row="0" Grid.Column="1" Name="Pre"></TextBox>
@@ -91,15 +91,15 @@
                     <TabItem Header="按字符串切割" Name="SplitString">
                         <Grid>
                             <Grid.RowDefinitions>
-                                <RowDefinition></RowDefinition>
-                                <RowDefinition></RowDefinition>
-                                <RowDefinition></RowDefinition>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                                <RowDefinition/>
                             </Grid.RowDefinitions>
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="65"></ColumnDefinition>
-                                <ColumnDefinition Width="*"></ColumnDefinition>
-                                <ColumnDefinition Width="65"></ColumnDefinition>
-                                <ColumnDefinition Width="*"></ColumnDefinition>
+                                <ColumnDefinition Width="65"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="65"/>
+                                <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
                             <TextBlock Grid.Row="0" Grid.Column="0">分割字符串</TextBlock>
                             <TextBox Grid.Row="0" Grid.Column="1" Name="SplitBox" Text=" "></TextBox>
@@ -112,20 +112,22 @@
                     <TabItem Header="替换字符串" Name="RegReplaceString">
                         <Grid>
                             <Grid.RowDefinitions>
-                                <RowDefinition></RowDefinition>
-                                <RowDefinition></RowDefinition>
+                                <RowDefinition/>
+                                <RowDefinition/>
                             </Grid.RowDefinitions>
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="65"></ColumnDefinition>
-                                <ColumnDefinition Width="*"></ColumnDefinition>
+                                <ColumnDefinition Width="65"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="auto"/>
                             </Grid.ColumnDefinitions>
                             <TextBlock Grid.Row="0" Grid.Column="0">旧字符串</TextBlock>
-                            <TextBox Grid.Row="0" Grid.Column="1" Name="OldStringBox"></TextBox>
+                            <TextBox Grid.Row="0" Grid.Column="1" Name="OldStringBox"/>
                             <TextBlock Grid.Row="1" Grid.Column="0">新字符串</TextBlock>
-                            <TextBox Grid.Row="1" Grid.Column="1" Name="NewStringBox"></TextBox>
+                            <TextBox Grid.Row="1" Grid.Column="1" Name="NewStringBox"/>
+                            <CheckBox Grid.Column="2" Name="IsMatchOnly" Content="仅获取匹配部分"/>
                         </Grid>
                     </TabItem>
-                    <TabItem Header="json格式化" Name="JsonBeautify"></TabItem>
+                    <TabItem Header="json格式化" Name="JsonBeautify"/>
                 </TabControl>
                 <Button Click="MakeButton_Click" IsDefault="True">生成</Button>
             </StackPanel>

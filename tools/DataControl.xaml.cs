@@ -4,6 +4,7 @@ using System.Windows.Controls;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 using System.IO;
+using System.Linq;
 using System.Collections.Generic;
 
 namespace tools
@@ -318,7 +319,17 @@ namespace tools
             string output = string.Empty;
             try
             {
-                return Regex.Replace(input, OldStringBox.Text, Regex.Unescape(NewStringBox.Text));
+                if ((bool)IsMatchOnly.IsChecked)
+                {
+                    var match = Regex.Match(input, OldStringBox.Text);
+                    for (; match.Success; match = match.NextMatch())
+                    {
+                        output += Regex.Replace(match.Groups[0].ToString(), OldStringBox.Text, Regex.Unescape(NewStringBox.Text));
+                    }
+                    return output;
+                }
+                else
+                    return Regex.Replace(input, OldStringBox.Text, Regex.Unescape(NewStringBox.Text));
             }
             catch (Exception ex)
             {

@@ -26,5 +26,13 @@ namespace tools
             }
             e.Handled = true;
         }
+
+        protected override void OnStartup(StartupEventArgs e)
+        {
+            //SplashScreen ss = new SplashScreen("SplashScreen.png");
+            //ss.Show(true);
+            ////ss.Close(new TimeSpan(0, 0, 10));
+            //base.OnStartup(e);
+        }
     }
 }

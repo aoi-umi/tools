@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Windows.Controls;
 using System.Windows.Documents;
@@ -16,6 +17,7 @@ namespace tools
             InitializeComponent();
             InputString = "http://127.0.0.1\r\nhosthttp://127.0.0.1\r\n<a href=\"http://127.0.0.1\">http://127.0.0.1</a>";
             RegexString = @"(?<!<a.*)(?:http|https)://[^\s]+";
+            MatchBox.IsHighlight = true;
         }
         private string InputString
         {
@@ -47,16 +49,7 @@ namespace tools
             {
                 RegexBox.Text = value;
             }
-        }
-
-        private string MatchString
-        {
-            set
-            {
-                if (string.IsNullOrEmpty(value)) MatchBox.NavigateToString("<html></html>");
-                else MatchBox.NavigateToString(ConvertExtendedASCII(value));
-            }
-        }
+        }        
 
         private void Input_TextChanged(object sender, TextChangedEventArgs e)
         {
@@ -79,17 +72,19 @@ namespace tools
                         m = m.NextMatch();
                         ++matchNum;
                     }
-                    string html = "<html><head><style>.f-pre {{ overflow: hidden; text-align: left; white-space: pre-wrap; word-break: break-all; word-wrap: break-word;}}" +
-                        ".match {{ color:black;background-color:yellow;}}</style>" + 
-                        "</head><body><pre class=\"f-pre\">{0}</body></pre></html>";
-                    if (!string.IsNullOrEmpty(output)) MatchString = string.Format(html, Regex.Replace(InputString, RegexString, "<font class=\"match\">$0</font>"));
-                    else MatchString = string.Empty;
+                    //string html = "<html><head><style>.f-pre {{ overflow: hidden; text-align: left; white-space: pre-wrap; word-break: break-all; word-wrap: break-word;}}" +
+                    //    ".match {{ color:black;background-color:yellow;}}</style>" + 
+                    //    "</head><body><pre class=\"f-pre\">{0}</body></pre></html>";
+                    //if (!string.IsNullOrEmpty(output)) MatchString = string.Format(html, Regex.Replace(InputString, RegexString, "<font class=\"match\">$0</font>"));
+                    //else MatchString = string.Empty;
+                    MatchBox.SearchText = RegexString;
+                    MatchBox.Text = InputString;
                     OutputString = output;
                 }
             }
             catch (Exception ex)
             {
-                MatchString = string.Empty;
+                MatchBox.Text = MatchBox.SearchText = string.Empty;
                 OutputString = DateTime.Now.ToString("HH:mm:ss") + "\r\n" + ex.ToString();
             }
         }
@@ -120,5 +115,16 @@ namespace tools
                 Console.WriteLine(" File: {0}; Class: {1}; Method: {2};Line: {3};Column: {4}", sf.GetFileName(), this.GetType().Name, sf.GetMethod().Name, sf.GetFileLineNumber(), sf.GetFileColumnNumber());
             }            
         }
+
+        //public void SuppressScriptErrors(WebBrowser wb, bool Hide)
+        //{
+        //    FieldInfo fiComWebBrowser = typeof(WebBrowser).GetField("_axIWebBrowser2", BindingFlags.Instance | BindingFlags.NonPublic);
+        //    if (fiComWebBrowser == null) return;
+
+        //    object objComWebBrowser = fiComWebBrowser.GetValue(wb);
+        //    if (objComWebBrowser == null) return;
+
+        //    objComWebBrowser.GetType().InvokeMember("Silent", BindingFlags.SetProperty, null, objComWebBrowser, new object[] { Hide });
+        //}
     }
 }
