@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Reflection;
 using System.Text.RegularExpressions;
@@ -18,6 +20,7 @@ namespace tools
             InputString = "http://127.0.0.1\r\nhosthttp://127.0.0.1\r\n<a href=\"http://127.0.0.1\">http://127.0.0.1</a>";
             RegexString = @"(?<!<a.*)(?:http|https)://[^\s]+";
             MatchBox.IsHighlight = true;
+            OutputTreeView.ItemsSource = dataList;
         }
         private string InputString
         {
@@ -49,8 +52,9 @@ namespace tools
             {
                 RegexBox.Text = value;
             }
-        }        
+        }
 
+        ObservableCollection<TreeViewItemModel> dataList = new ObservableCollection<TreeViewItemModel>();
         private void Input_TextChanged(object sender, TextChangedEventArgs e)
         {
             try
@@ -59,18 +63,22 @@ namespace tools
                 {
                     Match m = Regex.Match(InputString, RegexString);
                     string output = string.Empty;
+                    dataList.Clear();
                     int matchNum = 1;
                     while (m.Success)
                     {
+                        var model = new TreeViewItemModel() { Index = m.Index, Header = "match" + matchNum + ",Index(" + m.Index.ToString() + ")" };
                         output += "match" + matchNum + ",Index(" + m.Index.ToString() + "):\r\n";
                         int groupNum = 0;
                         foreach (var g in m.Groups)
                         {
+                            model.Items.Add(new TreeViewItemModel() { Header = "group" + groupNum + ": " + g.ToString()});
                             output += "\tgroup" + groupNum + ": " + g.ToString() + "\r\n";
                             ++groupNum;
                         }
                         m = m.NextMatch();
                         ++matchNum;
+                        dataList.Add(model);
                     }
                     //string html = "<html><head><style>.f-pre {{ overflow: hidden; text-align: left; white-space: pre-wrap; word-break: break-all; word-wrap: break-word;}}" +
                     //    ".match {{ color:black;background-color:yellow;}}</style>" + 
@@ -126,5 +134,16 @@ namespace tools
 
         //    objComWebBrowser.GetType().InvokeMember("Silent", BindingFlags.SetProperty, null, objComWebBrowser, new object[] { Hide });
         //}
+    }
+
+    public class TreeViewItemModel
+    {
+        public int Index { get; set; }
+        public string Header { get; set; }
+        public List<TreeViewItemModel> Items { get; set; }
+        public TreeViewItemModel()
+        {
+            Items = new List<TreeViewItemModel>();
+        }
     }
 }
