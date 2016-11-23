@@ -37,18 +37,18 @@
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="auto"/>
                     </Grid.ColumnDefinitions>
-                    <TextBlock Text="文件夹"></TextBlock>
-                    <TextBox Grid.Column="1" Name="PathBox" PreviewDrop="PathBox_PreviewDrop"  PreviewDragOver="PathBox_PreviewDragOver"></TextBox>
+                    <TextBlock Text="文件夹"/>
+                    <TextBox Grid.Column="1" Name="PathBox" PreviewDrop="PathBox_PreviewDrop"  PreviewDragOver="PathBox_PreviewDragOver"/>
                     <UniformGrid Grid.Column="2" Columns="2">
                         <Button Click="GetFileList_Click">获取</Button>
                         <Button Click="GetFileListAfterClear_Click">清除并获取</Button>
                     </UniformGrid>
-                    <TextBlock Grid.Row="1" Text="过滤"></TextBlock>
-                    <TextBox Grid.Row="1" Grid.Column="1" Name="FilterBox"></TextBox>
+                    <TextBlock Grid.Row="1" Text="过滤"/>
+                    <TextBox Grid.Row="1" Grid.Column="1" Name="FilterBox"/>
                     <CheckBox Name="IsGetMatchBox" Grid.Row="1" Grid.Column="2" >获取匹配</CheckBox>
                     <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal" Margin="0,4,0,0">
-                        <CheckBox Name="IsGetFileBox" Content="获取文件" IsChecked="True"></CheckBox>
-                        <CheckBox Name="IsGetFolderBox" Content="获取文件夹"></CheckBox>
+                        <CheckBox Name="IsGetFileBox" Content="获取文件" IsChecked="True"/>
+                        <CheckBox Name="IsGetFolderBox" Content="获取文件夹"/>
                         <CheckBox Name="IsGetChildDirBox">包括子文件夹</CheckBox>
                     </StackPanel>
                 </Grid>
@@ -70,13 +70,13 @@
                         <DockPanel Name="RenameByNewNameView" Grid.Column="1">
                             <TextBlock>新文件名</TextBlock>
                             <UniformGrid DockPanel.Dock="Right" Rows="1">
-                                <TextBlock HorizontalAlignment="Right">后缀名</TextBlock>
+                                <TextBlock HorizontalAlignment="Right" Text="后缀名"/>
                                 <TextBox Name="SufBox"></TextBox>
-                                <TextBlock HorizontalAlignment="Right">序号</TextBlock>
+                                <TextBlock HorizontalAlignment="Right" Text="序号"/>
                                 <TextBox Name="NumBox">01</TextBox>
                             </UniformGrid>
-                            <TextBlock DockPanel.Dock="Right" Text="&lt;&gt;符为序号插入位置"></TextBlock>
-                            <TextBox Name="NewNameBox"></TextBox>
+                            <TextBlock DockPanel.Dock="Right" Text="&lt;&gt;符为序号插入位置"/>
+                            <TextBox Name="NewNameBox"/>
                         </DockPanel>
                         <DockPanel Name="RenameByReplaceStringView" Grid.Column="1" Visibility="Collapsed">
                             <Grid>
@@ -88,10 +88,10 @@
                                     <ColumnDefinition Width="auto"/>
                                 </Grid.ColumnDefinitions>
                                 <TextBlock>原字符串</TextBlock>
-                                <TextBox Name="OldStringBox" Grid.Column="1"></TextBox>
-                                <TextBlock Grid.Column="2">新字符串</TextBlock>
-                                <TextBox Name="NewStringBox" Grid.Column="3"></TextBox>
-                                <CheckBox Name="ReplaceAll" Grid.Column="4" Visibility="Collapsed">匹配所有</CheckBox>
+                                <TextBox Name="OldStringBox" Grid.Column="1"/>
+                                <TextBlock Grid.Column="2" Text="新字符串"/>
+                                <TextBox Name="NewStringBox" Grid.Column="3"/>
+                                <CheckBox Name="ReplaceAll" Grid.Column="4" Visibility="Collapsed" Content="匹配所有"/>
                             </Grid>
                         </DockPanel>
                         <DockPanel Name="RenameByEncodingView" Grid.Column="1" Visibility="Collapsed">
@@ -106,17 +106,17 @@
                                 <TextBox Name="InsertIndexBox">0</TextBox>
                                 <TextBlock>负数为从后面开始插入</TextBlock>
                             </UniformGrid>
-                            <TextBox Name="InsertStringBox"></TextBox>
+                            <TextBox Name="InsertStringBox"/>
                         </DockPanel>
                         <DockPanel Name="RenameBySplitStringView" Grid.Column="1" Visibility="Collapsed">
                             <TextBlock>分隔字符串</TextBlock>
-                            <TextBox Name="SplitStringBox"></TextBox>
+                            <TextBox Name="SplitStringBox"/>
                         </DockPanel>
                     </Grid>
-                    <Button Content="预览" Click="Preview_Click"></Button>
+                    <Button Content="预览" Click="Preview_Click"/>
                 </StackPanel>
             </GroupBox>
-            <TextBlock Name="StatusMessageBox" DockPanel.Dock="Bottom" Text="文件数：0"></TextBlock>
+            <TextBlock Name="StatusMessageBox" DockPanel.Dock="Bottom" Text="文件数：0"/>
             <UniformGrid DockPanel.Dock="Bottom" Rows="1" Margin="0,5">
                 <Button Click="Rename_Click">重命名</Button>
                 <Button Click="Clear_Click">清除</Button>
@@ -142,15 +142,15 @@
                         <GridViewColumn Header="新文件名" Width="200">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
-                                        <TextBox Text="{Binding Path=NewFilename}" MinWidth="100"></TextBox>
+                                    <TextBox Text="{Binding Path=NewFilename}" MinWidth="100"/>
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
                         <GridViewColumn Header="状态" Width="200">
                             <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                    <TextBlock Text="{Binding Path=Status}" Foreground="{Binding Path=IsSuccess, Converter={StaticResource SuccessConverter}, Mode=OneWay}"></TextBlock>                            
-                            </DataTemplate>
+                                    <TextBlock Text="{Binding Path=Status}" Foreground="{Binding Path=IsSuccess, Converter={StaticResource SuccessConverter}, Mode=OneWay}"/>
+                                </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
                     </GridView>

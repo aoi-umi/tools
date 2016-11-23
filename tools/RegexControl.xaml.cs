@@ -80,11 +80,6 @@ namespace tools
                         ++matchNum;
                         dataList.Add(model);
                     }
-                    //string html = "<html><head><style>.f-pre {{ overflow: hidden; text-align: left; white-space: pre-wrap; word-break: break-all; word-wrap: break-word;}}" +
-                    //    ".match {{ color:black;background-color:yellow;}}</style>" + 
-                    //    "</head><body><pre class=\"f-pre\">{0}</body></pre></html>";
-                    //if (!string.IsNullOrEmpty(output)) MatchString = string.Format(html, Regex.Replace(InputString, RegexString, "<font class=\"match\">$0</font>"));
-                    //else MatchString = string.Empty;
                     MatchBox.SearchText = RegexString;
                     MatchBox.Text = InputString;
                     OutputString = output;
@@ -123,17 +118,6 @@ namespace tools
                 Console.WriteLine(" File: {0}; Class: {1}; Method: {2};Line: {3};Column: {4}", sf.GetFileName(), this.GetType().Name, sf.GetMethod().Name, sf.GetFileLineNumber(), sf.GetFileColumnNumber());
             }            
         }
-
-        //public void SuppressScriptErrors(WebBrowser wb, bool Hide)
-        //{
-        //    FieldInfo fiComWebBrowser = typeof(WebBrowser).GetField("_axIWebBrowser2", BindingFlags.Instance | BindingFlags.NonPublic);
-        //    if (fiComWebBrowser == null) return;
-
-        //    object objComWebBrowser = fiComWebBrowser.GetValue(wb);
-        //    if (objComWebBrowser == null) return;
-
-        //    objComWebBrowser.GetType().InvokeMember("Silent", BindingFlags.SetProperty, null, objComWebBrowser, new object[] { Hide });
-        //}
     }
 
     public class TreeViewItemModel

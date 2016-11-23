@@ -182,6 +182,9 @@ namespace tools
             Regex regex = new Regex(searchstring);
             Match match = regex.Match(compareText);
             Run run = null;
+            int i = 0;
+            var defaultHighlightBackground = this.HighlightBackground.Clone();
+            var highlightBackground2 = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#80c0ff"));
             while (!string.IsNullOrEmpty(searchstring) && match.Success)
             {
                 string trueSearchstring = match.Groups[0].ToString();
@@ -192,8 +195,10 @@ namespace tools
                 {
                     displayTextBlock.Inlines.Add(run);
                 }
-
+                if (i % 2 == 0) this.HighlightBackground = defaultHighlightBackground;
+                else this.HighlightBackground = highlightBackground2;
                 run = GenerateRun(displayText.Substring(position, trueSearchstring.Length), true);
+                this.HighlightBackground = defaultHighlightBackground;
 
                 if (run != null)
                 {
@@ -203,6 +208,7 @@ namespace tools
                 compareText = compareText.Substring(position + trueSearchstring.Length);
                 displayText = displayText.Substring(position + trueSearchstring.Length);
                 match = match.NextMatch();
+                ++i;
             }
             //while (!string.IsNullOrEmpty(searchstring) && compareText.IndexOf(searchstring) >= 0)
             //{
