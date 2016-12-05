@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Windows.Controls;
 using System.Windows.Documents;
+using System.Windows.Media;
 
 namespace tools
 {
@@ -19,18 +20,22 @@ namespace tools
             InitializeComponent();
             InputString = "http://127.0.0.1\r\nhosthttp://127.0.0.1\r\n<a href=\"http://127.0.0.1\">http://127.0.0.1</a>";
             RegexString = @"(?<!<a.*)(?:http|https)://[^\s]+";
-            MatchBox.IsHighlight = true;
             OutputTreeView.ItemsSource = dataList;
         }
         private string InputString
         {
             get
             {
-                return InputBox.Text.Trim();
+                if (InputBox.Document == null) return string.Empty;
+                TextRange documentRange = new TextRange(InputBox.Document.ContentStart, InputBox.Document.ContentEnd);
+                return documentRange.Text.Trim();
             }
             set
             {
-                InputBox.Text = value;
+                InputBox.Document.Blocks.Clear();
+                var p = new Paragraph() { LineHeight = 1 };
+                p.Inlines.Add(new Run(value));
+                InputBox.Document.Blocks.Add(p);
             }
         }
 
@@ -54,69 +59,93 @@ namespace tools
             }
         }
 
+        Brush highlightBackground1 = Brushes.Yellow;
+        Brush highlightBackground2 = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#80c0ff"));
         ObservableCollection<TreeViewItemModel> dataList = new ObservableCollection<TreeViewItemModel>();
         private void Input_TextChanged(object sender, TextChangedEventArgs e)
         {
+            if (!(!string.IsNullOrEmpty(RegexString) && !(string.IsNullOrEmpty(InputString)))) return;
             try
             {
-                if (!string.IsNullOrEmpty(RegexString) && !(string.IsNullOrEmpty(InputString)))
+                InputBox.TextChanged -= Input_TextChanged;
+                Match m = Regex.Match(InputString, RegexString);
+                string output = string.Empty;
+                dataList.Clear();
+                m_tags.Clear();
+                TextRange documentRange = new TextRange(InputBox.Document.ContentStart, InputBox.Document.ContentEnd);
+                documentRange.ClearAllProperties();
+                CheckWordsInFlowDocument(InputBox.Document);
+
+                for (int i = 0; i < m_tags.Count; i++)
                 {
-                    Match m = Regex.Match(InputString, RegexString);
-                    string output = string.Empty;
-                    dataList.Clear();
-                    int matchNum = 1;
-                    while (m.Success)
-                    {
-                        var model = new TreeViewItemModel() { Index = m.Index, Header = "match" + matchNum + ",Index(" + m.Index.ToString() + ")" };
-                        output += "match" + matchNum + ",Index(" + m.Index.ToString() + "):\r\n";
-                        int groupNum = 0;
-                        foreach (var g in m.Groups)
-                        {
-                            model.Items.Add(new TreeViewItemModel() { Header = "group" + groupNum + ": " + g.ToString()});
-                            output += "\tgroup" + groupNum + ": " + g.ToString() + "\r\n";
-                            ++groupNum;
-                        }
-                        m = m.NextMatch();
-                        ++matchNum;
-                        dataList.Add(model);
-                    }
-                    MatchBox.SearchText = RegexString;
-                    MatchBox.Text = InputString;
-                    OutputString = output;
+                    TextRange range = new TextRange(m_tags[i].StartPosition, m_tags[i].EndPosition);
+                    range.ApplyPropertyValue(TextElement.BackgroundProperty, i % 2 == 0 ? highlightBackground1 : highlightBackground2);
                 }
+
+                OutputString = DateTime.Now.ToString("HH:mm:ss") + "\r\n共" + dataList.Count + "个匹配项";
             }
             catch (Exception ex)
             {
-                MatchBox.Text = MatchBox.SearchText = string.Empty;
                 OutputString = DateTime.Now.ToString("HH:mm:ss") + "\r\n" + ex.ToString();
             }
+
+            InputBox.TextChanged += Input_TextChanged;
+        }      
+
+        new struct Tag
+        {
+            public TextPointer StartPosition;
+            public TextPointer EndPosition;
+            public string Word;
         }
 
-        private static string ConvertExtendedASCII(string HTML)
+        List<Tag> m_tags = new List<Tag>();
+        internal void CheckWordsInFlowDocument(FlowDocument flowDocument) //do not hightlight keywords in this method
         {
-            string retVal = "";
-            char[] s = HTML.ToCharArray();
-
-            foreach (char c in s)
+            TextPointer navigator = InputBox.Document.ContentStart;
+            TextPointer start = InputBox.Document.ContentStart;
+            TextPointerContext context = navigator.GetPointerContext(LogicalDirection.Backward);
+            
+            var text = InputString;
+            if (string.IsNullOrEmpty(text)) return;
+            Match match = Regex.Match(text, RegexString);
+            int matchNum = 1;
+            while (match.Success)
             {
-                if (Convert.ToInt32(c) > 127)
-                    retVal += "&#" + Convert.ToInt32(c) + ";";
-                else
-                    retVal += c;
+                var startPos = match.Index;
+                var model = new TreeViewItemModel() { Index = startPos, Header = "match" + matchNum + ",Index(" + startPos.ToString() + ")" };
+                int groupNum = 0;
+                foreach (var g in match.Groups)
+                {
+                    model.Items.Add(new TreeViewItemModel() { Header = "group" + groupNum + ": " + g.ToString() });
+                    ++groupNum;
+                }
+                ++matchNum;
+                dataList.Add(model);
+
+                string trueSearchstring = match.Groups[0].ToString();
+                int position = text.IndexOf(trueSearchstring);
+                string word = text.Substring(position, trueSearchstring.Length);
+                //var textLength = 0;
+                var offset = 0;
+                //do
+                //{
+                //    if (start.GetPointerContext(LogicalDirection.Forward) != TextPointerContext.Text)
+                //        ++offset;
+                //    textLength += start.GetTextRunLength(LogicalDirection.Forward);
+                //    start = start.GetNextContextPosition(LogicalDirection.Forward);
+                //} while (textLength < startPos || start.GetPointerContext(LogicalDirection.Forward) != TextPointerContext.Text);
+
+
+                Tag t = new Tag();
+                t.StartPosition = navigator.GetPositionAtOffset(startPos + offset, LogicalDirection.Forward);
+                t.EndPosition = navigator.GetPositionAtOffset(startPos + offset + word.Length, LogicalDirection.Forward);
+                t.Word = word;
+                m_tags.Add(t);
+
+                text = text.Substring(position + trueSearchstring.Length);
+                match = match.NextMatch();
             }
-
-            return retVal;
-        }
-
-        private void WriteLog()
-        {
-            StackTrace st = new StackTrace(true);
-            StackFrame[] sfs = st.GetFrames();
-            if (sfs.Length >= 2)
-            {
-                StackFrame sf = sfs[1];
-                Console.WriteLine(" File: {0}; Class: {1}; Method: {2};Line: {3};Column: {4}", sf.GetFileName(), this.GetType().Name, sf.GetMethod().Name, sf.GetFileLineNumber(), sf.GetFileColumnNumber());
-            }            
         }
     }
 

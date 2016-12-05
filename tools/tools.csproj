@@ -86,7 +86,6 @@
     <Compile Include="RenameControl.xaml.cs">
       <DependentUpon>RenameControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="SearchableTextControl.cs" />
     <Page Include="CodeControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
