@@ -62,7 +62,7 @@ namespace tools
         ObservableCollection<TreeViewItemModel> dataList = new ObservableCollection<TreeViewItemModel>();
         private void Input_TextChanged(object sender, TextChangedEventArgs e)
         {
-            if (!(!string.IsNullOrEmpty(RegexString) && !(string.IsNullOrEmpty(InputString)))) return;
+            if (string.IsNullOrEmpty(RegexString) || string.IsNullOrEmpty(InputString)) return;
             try
             {
                 InputBox.TextChanged -= Input_TextChanged;
