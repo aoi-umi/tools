@@ -18,7 +18,7 @@ namespace tools
         public RegexControl()
         {
             InitializeComponent();
-            InputString = "http://127.0.0.1\r\nhosthttp://127.0.0.1\r\n<a href=\"http://127.0.0.1\">http://127.0.0.1</a>";
+            InputString = "http://127.0.0.1\r\nhosthttp://127.0.0.2\r\n<a href=\"http://127.0.0.3\">http://127.0.0.3</a>";
             RegexString = @"(?<!<a.*)(?:http|https)://[^\s]+";
             OutputTreeView.ItemsSource = dataList;
         }
@@ -103,8 +103,6 @@ namespace tools
         internal void CheckWordsInFlowDocument(FlowDocument flowDocument) //do not hightlight keywords in this method
         {
             TextPointer navigator = InputBox.Document.ContentStart;
-            TextPointer start = InputBox.Document.ContentStart;
-            TextPointerContext context = navigator.GetPointerContext(LogicalDirection.Backward);
             
             var text = InputString;
             if (string.IsNullOrEmpty(text)) return;
@@ -112,6 +110,7 @@ namespace tools
             int matchNum = 1;
             while (match.Success)
             {
+                TextPointer start = InputBox.Document.ContentStart;
                 var startPos = match.Index;
                 var model = new TreeViewItemModel() { Index = startPos, Header = "match" + matchNum + ",Index(" + startPos.ToString() + ")" };
                 int groupNum = 0;
@@ -126,16 +125,21 @@ namespace tools
                 string trueSearchstring = match.Groups[0].ToString();
                 int position = text.IndexOf(trueSearchstring);
                 string word = text.Substring(position, trueSearchstring.Length);
-                //var textLength = 0;
-                var offset = 0;
-                //do
-                //{
-                //    if (start.GetPointerContext(LogicalDirection.Forward) != TextPointerContext.Text)
-                //        ++offset;
-                //    textLength += start.GetTextRunLength(LogicalDirection.Forward);
-                //    start = start.GetNextContextPosition(LogicalDirection.Forward);
-                //} while (textLength < startPos || start.GetPointerContext(LogicalDirection.Forward) != TextPointerContext.Text);
-
+                var textLength = 0;
+                var offset = 0;                
+                do
+                {
+                    var context = start.GetPointerContext(LogicalDirection.Forward);
+                    while (context != TextPointerContext.Text)
+                    {
+                        if(context == TextPointerContext.ElementStart)
+                            ++offset;
+                        start = start.GetNextContextPosition(LogicalDirection.Forward);
+                        context = start.GetPointerContext(LogicalDirection.Forward);
+                    }
+                    textLength += start.GetTextRunLength(LogicalDirection.Forward);
+                    start = start.GetNextContextPosition(LogicalDirection.Forward);
+                } while (textLength < startPos);
 
                 Tag t = new Tag();
                 t.StartPosition = navigator.GetPositionAtOffset(startPos + offset, LogicalDirection.Forward);

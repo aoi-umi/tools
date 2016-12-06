@@ -36,6 +36,5 @@
             <TextBlock DockPanel.Dock="Top">正则</TextBlock>
             <TextBox Name="RegexBox"  TextChanged="Input_TextChanged" AcceptsReturn="False" AcceptsTab="False"/>
         </DockPanel>
-        <!--<local:SearchableTextControl Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Margin="5,15,0,0" x:Name="MatchBox" BorderThickness="1" BorderBrush="Gray"/>-->
     </Grid>
 </UserControl>
