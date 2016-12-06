@@ -28,7 +28,9 @@
         <TreeView Grid.Row="1" Grid.Column="1" Margin="5,15,0,0" Name="OutputTreeView">
             <TreeView.ItemTemplate>
                 <HierarchicalDataTemplate ItemsSource="{Binding Items}">
-                    <TextBlock Text="{Binding Header}"/>
+                    <StackPanel>
+                        <TextBox Text="{Binding Header}" IsReadOnly="True" BorderThickness="0"/>
+                    </StackPanel>
                 </HierarchicalDataTemplate>
             </TreeView.ItemTemplate>
         </TreeView>
