@@ -100,7 +100,7 @@ namespace tools
         List<Tag> m_tags = new List<Tag>();
         internal void CheckWordsInFlowDocument(FlowDocument flowDocument) //do not hightlight keywords in this method
         {
-            TextPointer navigator = InputBox.Document.ContentStart;
+            TextPointer navigator = flowDocument.ContentStart;
             
             var text = InputString;
             if (string.IsNullOrEmpty(text)) return;
@@ -124,14 +124,21 @@ namespace tools
                 int position = text.IndexOf(trueSearchstring);
                 string word = text.Substring(position, trueSearchstring.Length);
                 var textLength = 0;
-                var offset = 0;                
+                var startOffset = 0;
+                
+                //var s = flowDocument.ContentStart;
+                //while (flowDocument.ContentEnd.CompareTo(s) > -1)
+                //{
+                //    var x = s.GetPointerContext(LogicalDirection.Forward);
+                //    s = s.GetNextContextPosition(LogicalDirection.Forward);
+                //}         
                 do
                 {
                     var context = start.GetPointerContext(LogicalDirection.Forward);
                     while (context != TextPointerContext.Text)
                     {
                         if(context == TextPointerContext.ElementStart)
-                            ++offset;
+                            ++startOffset;
                         start = start.GetNextContextPosition(LogicalDirection.Forward);
                         context = start.GetPointerContext(LogicalDirection.Forward);
                     }
@@ -139,9 +146,24 @@ namespace tools
                     start = start.GetNextContextPosition(LogicalDirection.Forward);
                 } while (textLength < startPos);
 
+                var endOffset = startOffset;
+                while (textLength - startPos - word.Length < 0 && start != null)
+                {
+                    var context = start.GetPointerContext(LogicalDirection.Forward);
+                    while (context != TextPointerContext.Text && context != TextPointerContext.None)
+                    {
+                        if (context == TextPointerContext.ElementStart)
+                            ++endOffset;
+                        start = start.GetNextContextPosition(LogicalDirection.Forward);
+                        context = start.GetPointerContext(LogicalDirection.Forward);
+                    }
+                    textLength += start.GetTextRunLength(LogicalDirection.Forward);
+                    start = start.GetNextContextPosition(LogicalDirection.Forward);
+                }
+
                 Tag t = new Tag();
-                t.StartPosition = navigator.GetPositionAtOffset(startPos + offset, LogicalDirection.Forward);
-                t.EndPosition = navigator.GetPositionAtOffset(startPos + offset + word.Length, LogicalDirection.Forward);
+                t.StartPosition = navigator.GetPositionAtOffset(startPos + startOffset, LogicalDirection.Forward);
+                t.EndPosition = navigator.GetPositionAtOffset(startPos + word.Length + endOffset, LogicalDirection.Forward);
                 t.Word = word;
                 m_tags.Add(t);
 
