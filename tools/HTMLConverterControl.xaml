@@ -26,7 +26,18 @@
                 </DockPanel>
                 <DockPanel>
                     <TextBlock DockPanel.Dock="Top">RichTextBox</TextBlock>
-                    <RichTextBox IsReadOnly="True" Name="PreviewRichTextBox"></RichTextBox>
+                    <UniformGrid Rows="1">
+                        <RichTextBox IsReadOnly="True" Name="PreviewRichTextBox"></RichTextBox>
+                        <TreeView Name="PreviewTreeView">
+                            <TreeView.ItemTemplate>
+                                <HierarchicalDataTemplate ItemsSource="{Binding Items}">
+                                    <StackPanel>
+                                        <TextBox Text="{Binding Header}" IsReadOnly="True" BorderThickness="0"/>
+                                    </StackPanel>
+                                </HierarchicalDataTemplate>
+                            </TreeView.ItemTemplate>
+                        </TreeView>
+                    </UniformGrid>
                 </DockPanel>
                 <DockPanel>
                     <TextBlock DockPanel.Dock="Top">xaml</TextBlock>
