@@ -16,7 +16,7 @@ namespace tools
         public RegexControl()
         {
             InitializeComponent();
-            InputString = "http://127.0.0.1\r\nhosthttp://127.0.0.2\r\n<a href=\"http://127.0.0.3\">http://127.0.0.3</a>";
+            InputString = "http://127.0.0.1\rhosthttp://127.0.0.2\r\n<a href=\"http://127.0.0.3\">http://127.0.0.3</a>\nhttp://127.0.0.1";
             RegexString = @"(?<!<a.*)(?:http|https)://[^\s]+";
             OutputTreeView.ItemsSource = dataList;
         }
@@ -101,105 +101,144 @@ namespace tools
         List<Tag> m_tags = new List<Tag>();
         void CheckWordsInFlowDocument(FlowDocument flowDocument) //do not hightlight keywords in this method
         {
-            TextPointer navigator = flowDocument.ContentStart;
-
-            var text = InputString;
-            if (string.IsNullOrEmpty(text)) return;
-            Match match = Regex.Match(text, RegexString);
-            int matchNum = 1;
-            int hadReadLength = 0;
-            while (match.Success)
+            try
             {
-                TextPointer start = InputBox.Document.ContentStart;
-                string word = match.Groups[0].ToString();
-                int startPos = match.Index, endPos = startPos + word.Length;
-
-                var model = new TreeViewItemModel() { Index = startPos, Header = "match" + matchNum + ",Index(" + startPos.ToString() + ")" };
-                int groupNum = 0;
-                foreach (var g in match.Groups)
+                TextPointer navigator = flowDocument.ContentStart;
+                var text = InputString;
+                if (string.IsNullOrEmpty(text)) return;
+                Match match = Regex.Match(text, RegexString);
+                int matchNum = 1;
+                while (match.Success)
                 {
-                    model.Items.Add(new TreeViewItemModel() { Header = "group" + groupNum + ": " + g.ToString() });
-                    ++groupNum;
-                }
-                ++matchNum;
-                dataList.Add(model);
+                    TextPointer start = InputBox.Document.ContentStart;
+                    string word = match.Groups[0].ToString();
+                    int startPos = match.Index, endOffset = word.Length;
 
-                var textLength = 0;
-                var startOffset = startPos;
-                var endOffset = endPos;
-                Tag t = new Tag();
-                t.Word = word;
-                while (start != null && flowDocument.ContentEnd.CompareTo(start) > -1 && textLength < startPos)
-                {
-                    var context = start.GetPointerContext(LogicalDirection.Forward);
-                    if (context != TextPointerContext.Text)
+                    var model = new TreeViewItemModel() { Index = startPos, Header = "match" + matchNum + ",Index(" + startPos.ToString() + ")" };
+                    int groupNum = 0;
+                    foreach (var g in match.Groups)
                     {
-                        start = start.GetNextContextPosition(LogicalDirection.Forward);
-                        continue;
+                        model.Items.Add(new TreeViewItemModel() { Header = "group" + groupNum + ": " + g.ToString() });
+                        ++groupNum;
                     }
-                    int len = start.GetTextRunLength(LogicalDirection.Forward);
-                    textLength += len;
-                    if(textLength < startPos) startOffset -= len;
+                    ++matchNum;
+                    dataList.Add(model);
+
+                    Tag t = new Tag();
+                    t.Word = word;
+                    #region 设置高亮范围
+                    t.StartPosition = GetPointer(flowDocument.ContentEnd, start, startPos);
+                    t.EndPosition = GetPointer(flowDocument.ContentEnd, t.StartPosition, endOffset);
+                    //var textLength = 0;
+                    //var startOffset = startPos;
+                    //var endOffset = word.Length;                    
+                    //while (start != null && flowDocument.ContentEnd.CompareTo(start) > -1)
+                    //{
+                    //    while (start.GetPointerContext(LogicalDirection.Forward) != TextPointerContext.Text)
+                    //    {
+                    //        TextPointerContext context = start.GetPointerContext(LogicalDirection.Forward);
+                    //        if (context == TextPointerContext.ElementEnd)
+                    //        {
+                    //            var next = start.GetNextContextPosition(LogicalDirection.Forward);
+                    //            if (next != null && next.GetPointerContext(LogicalDirection.Forward) == TextPointerContext.ElementEnd)
+                    //            {
+                    //                textLength += 2;
+                    //                startOffset -= 2;
+                    //                start = next;
+                    //            }
+                    //        }
+                    //        start = start.GetNextContextPosition(LogicalDirection.Forward);
+                    //    }
+                    //    var len = start.GetTextRunLength(LogicalDirection.Forward);
+                    //    if (textLength + len < startPos)
+                    //    {
+                    //        textLength += len;
+                    //        startOffset -= len;
+                    //        start = start.GetNextContextPosition(LogicalDirection.Forward);
+                    //    }
+                    //    else
+                    //    {
+                    //        break;
+                    //    }
+                    //}
+                    //t.StartPosition = start.GetPositionAtOffset(startOffset, LogicalDirection.Forward);
+                    //TextPointer end = t.StartPosition;
+                    //textLength = 0;
+                    //while (end != null && flowDocument.ContentEnd.CompareTo(end) > -1)
+                    //{
+                    //    while (end.GetPointerContext(LogicalDirection.Forward) != TextPointerContext.Text)
+                    //    {
+                    //        TextPointerContext context = end.GetPointerContext(LogicalDirection.Forward);
+                    //        if (context == TextPointerContext.ElementEnd)
+                    //        {
+                    //            var next = end.GetNextContextPosition(LogicalDirection.Forward);
+                    //            if (next != null && next.GetPointerContext(LogicalDirection.Forward) == TextPointerContext.ElementEnd)
+                    //            {
+                    //                textLength += 2;
+                    //                endOffset -= 2;
+                    //                end = next;
+                    //            }
+                    //        }
+                    //        end = end.GetNextContextPosition(LogicalDirection.Forward);
+                    //    }
+                    //    var len = end.GetTextRunLength(LogicalDirection.Forward);
+                    //    if (textLength + len < word.Length)
+                    //    {
+                    //        textLength += len;
+                    //        endOffset -= len;
+                    //        end = end.GetNextContextPosition(LogicalDirection.Forward);
+                    //    }
+                    //    else
+                    //    {
+                    //        break;
+                    //    }
+                    //}
+                    //t.EndPosition = end.GetPositionAtOffset(endOffset, LogicalDirection.Forward);
+                    m_tags.Add(t);
+                    #endregion
+                    match = match.NextMatch();
                 }
-                t.StartPosition = start.GetPositionAtOffset(startOffset, LogicalDirection.Forward);
-
-                while (start != null && flowDocument.ContentEnd.CompareTo(start) > -1 && textLength < startOffset + word.Length)
-                {
-                    var context = start.GetPointerContext(LogicalDirection.Forward);
-                    if (context != TextPointerContext.Text)
-                    {
-                        start = start.GetNextContextPosition(LogicalDirection.Forward);
-                        continue;
-                    }
-                    int len = start.GetTextRunLength(LogicalDirection.Forward);
-                    textLength += len;
-                    if(textLength < startPos + word.Length) endOffset -= len;
-                }
-                t.EndPosition = start.GetPositionAtOffset(endOffset, LogicalDirection.Forward);
-
-                m_tags.Add(t);
-                //var s = flowDocument.ContentStart;
-                //while (flowDocument.ContentEnd.CompareTo(s) > -1)
-                //{
-                //    var x = s.GetPointerContext(LogicalDirection.Forward);
-                //    s = s.GetNextContextPosition(LogicalDirection.Forward);
-                //}         
-
-                //do
-                //{
-                //    var context = start.GetPointerContext(LogicalDirection.Forward);
-                //    while (context != TextPointerContext.Text)
-                //    {
-                //        if (context == TextPointerContext.ElementStart || context == TextPointerContext.ElementEnd)
-                //            ++startOffset;
-                //        start = start.GetNextContextPosition(LogicalDirection.Forward);
-                //        context = start.GetPointerContext(LogicalDirection.Forward);
-                //    }
-                //    textLength += start.GetTextRunLength(LogicalDirection.Forward);
-                //    start = start.GetNextContextPosition(LogicalDirection.Forward);
-                //} while (textLength < startPos);
-
-                //while (textLength - startPos - word.Length < 0 && start != null)
-                //{
-                //    var context = start.GetPointerContext(LogicalDirection.Forward);
-                //    while (context != TextPointerContext.Text && context != TextPointerContext.None)
-                //    {
-                //        if (context == TextPointerContext.ElementStart)
-                //            ++endOffset;
-                //        start = start.GetNextContextPosition(LogicalDirection.Forward);
-                //        context = start.GetPointerContext(LogicalDirection.Forward);
-                //    }
-                //    textLength += start.GetTextRunLength(LogicalDirection.Forward);
-                //    start = start.GetNextContextPosition(LogicalDirection.Forward);
-                //}
-
-
-
-
-
-                //text = text.Substring(startPos + word.Length);
-                match = match.NextMatch();
             }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        private TextPointer GetPointer(TextPointer docEnd, TextPointer startPointer, int offset)
+        {
+            int findEnd = offset, textLength = 0;
+            while (startPointer != null && docEnd.CompareTo(startPointer) > -1)
+            {
+                while (startPointer.GetPointerContext(LogicalDirection.Forward) != TextPointerContext.Text)
+                {
+                    TextPointerContext context = startPointer.GetPointerContext(LogicalDirection.Forward);
+                    if (context == TextPointerContext.ElementEnd)
+                    {
+                        var next = startPointer.GetNextContextPosition(LogicalDirection.Forward);
+                        if (next != null && next.GetPointerContext(LogicalDirection.Forward) == TextPointerContext.ElementEnd)
+                        {
+                            textLength += 2;
+                            offset -= 2;
+                            startPointer = next;
+                        }
+                    }
+                    startPointer = startPointer.GetNextContextPosition(LogicalDirection.Forward);
+                }
+                var len = startPointer.GetTextRunLength(LogicalDirection.Forward);
+                if (textLength + len < findEnd)
+                {
+                    textLength += len;
+                    offset -= len;
+                    startPointer = startPointer.GetNextContextPosition(LogicalDirection.Forward);
+                }
+                else
+                {
+                    break;
+                }
+            }
+            var tp = startPointer.GetPositionAtOffset(offset, LogicalDirection.Forward);
+            return tp;
         }
 
         private List<TreeViewItemModel> GetTreeItem(FlowDocument document)
@@ -214,48 +253,27 @@ namespace tools
                 switch (context)
                 {
                     case TextPointerContext.ElementStart:
-                        model.Header = context.ToString() + ":";
                         //    start = start.GetNextContextPosition(LogicalDirection.Forward);
                         //    model.Items = GetTreeItem(document ,ref start);
-                        list.Add(model);
-                        break;
+                        
                     case TextPointerContext.None:
                     case TextPointerContext.ElementEnd:
                     //    return list;
                     case TextPointerContext.EmbeddedElement:
+                        model.Header = context.ToString() + ":";
+                        list.Add(model);
+                        break;
                     case TextPointerContext.Text:
                         //default:
                         model.Header = context.ToString() + ":";
-                        model.Header += start.GetTextInRun(LogicalDirection.Forward);
+                        model.Header += "length(" + start.GetTextRunLength(LogicalDirection.Forward) + ")" + start.GetTextInRun(LogicalDirection.Forward);
                         list.Add(model);
                         break;
                 }
                 start = start.GetNextContextPosition(LogicalDirection.Forward);
             }
             return list;
-        }
-
-        // Returns the offset for the specified position relative to any containing paragraph.
-        int GetOffsetRelativeToParagraph(TextPointer position)
-        {
-            // Adjust the pointer to the closest forward insertion position, and look for any
-            // containing paragraph.
-            Paragraph paragraph = (position.GetInsertionPosition(LogicalDirection.Forward)).Paragraph;
-
-            // Some positions may be not within any Paragraph; 
-            // this method returns an offset of -1 to indicate this condition.
-            return (paragraph == null) ? -1 : paragraph.ContentStart.GetOffsetToPosition(position);
-        }
-
-        // Returns a TextPointer to a specified offset into a specified paragraph. 
-        TextPointer GetTextPointerRelativeToParagraph(Paragraph paragraph, int offsetRelativeToParagraph)
-        {
-            // Verify that the specified offset falls within the specified paragraph.  If the offset is
-            // past the end of the paragraph, return a pointer to the farthest offset position in the paragraph.
-            // Otherwise, return a TextPointer to the specified offset in the specified paragraph.
-            return (offsetRelativeToParagraph > paragraph.ContentStart.GetOffsetToPosition(paragraph.ContentEnd))
-                ? paragraph.ContentEnd : paragraph.ContentStart.GetPositionAtOffset(offsetRelativeToParagraph);
-        }
+        }        
     }
 
     public class TreeViewItemModel
