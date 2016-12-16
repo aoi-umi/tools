@@ -142,38 +142,46 @@ namespace tools
 
         private TextPointer GetPointer(TextPointer docEnd, TextPointer startPointer, int offset)
         {
-            int findEnd = offset, textLength = 0;
-            while (startPointer != null && docEnd.CompareTo(startPointer) > -1)
+            try
             {
-                while (startPointer.GetPointerContext(LogicalDirection.Forward) != TextPointerContext.Text)
+                int findEnd = offset, textLength = 0;
+                while (startPointer != null && docEnd.CompareTo(startPointer) > -1)
                 {
-                    TextPointerContext context = startPointer.GetPointerContext(LogicalDirection.Forward);
-                    if (context == TextPointerContext.ElementEnd)
+                    while (startPointer != null && startPointer.GetPointerContext(LogicalDirection.Forward) != TextPointerContext.Text)
                     {
-                        var next = startPointer.GetNextContextPosition(LogicalDirection.Forward);
-                        if (next != null && next.GetPointerContext(LogicalDirection.Forward) == TextPointerContext.ElementEnd)
+                        TextPointerContext context = startPointer.GetPointerContext(LogicalDirection.Forward);
+                        if (context == TextPointerContext.ElementEnd)
                         {
-                            textLength += 2;
-                            offset -= 2;
-                            startPointer = next;
+                            var next = startPointer.GetNextContextPosition(LogicalDirection.Forward);
+                            if (next != null && next.GetPointerContext(LogicalDirection.Forward) == TextPointerContext.ElementEnd)
+                            {
+                                textLength += 2;
+                                offset -= 2;
+                                startPointer = next;
+                            }
                         }
+                        startPointer = startPointer.GetNextContextPosition(LogicalDirection.Forward);
                     }
-                    startPointer = startPointer.GetNextContextPosition(LogicalDirection.Forward);
+                    if (startPointer == null) return docEnd;
+                    var len = startPointer.GetTextRunLength(LogicalDirection.Forward);
+                    if (textLength + len < findEnd)
+                    {
+                        textLength += len;
+                        offset -= len;
+                        startPointer = startPointer.GetNextContextPosition(LogicalDirection.Forward);
+                    }
+                    else
+                    {
+                        break;
+                    }
                 }
-                var len = startPointer.GetTextRunLength(LogicalDirection.Forward);
-                if (textLength + len < findEnd)
-                {
-                    textLength += len;
-                    offset -= len;
-                    startPointer = startPointer.GetNextContextPosition(LogicalDirection.Forward);
-                }
-                else
-                {
-                    break;
-                }
+                var tp = startPointer.GetPositionAtOffset(offset, LogicalDirection.Forward);
+                return tp;
             }
-            var tp = startPointer.GetPositionAtOffset(offset, LogicalDirection.Forward);
-            return tp;
+            catch (Exception ex)
+            {
+                throw ex;
+            }
         }
 
         private List<TreeViewItemModel> GetTreeItem(FlowDocument document)
