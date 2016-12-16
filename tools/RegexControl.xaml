@@ -35,7 +35,7 @@
                     </HierarchicalDataTemplate>
                 </TreeView.ItemTemplate>
             </TreeView>
-            <TreeView Name="InputTreeView">
+            <!--<TreeView Name="InputTreeView">
                 <TreeView.ItemTemplate>
                     <HierarchicalDataTemplate ItemsSource="{Binding Items}">
                         <StackPanel>
@@ -43,7 +43,7 @@
                         </StackPanel>
                     </HierarchicalDataTemplate>
                 </TreeView.ItemTemplate>
-            </TreeView>
+            </TreeView>-->
         </UniformGrid>
         <DockPanel Grid.Row="1" Grid.Column="0">
             <TextBlock DockPanel.Dock="Top">正则</TextBlock>

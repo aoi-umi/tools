@@ -73,7 +73,7 @@ namespace tools
                 TextRange documentRange = new TextRange(InputBox.Document.ContentStart, InputBox.Document.ContentEnd);
                 documentRange.ClearAllProperties();
 
-                InputTreeView.ItemsSource = GetTreeItem(InputBox.Document);
+                //InputTreeView.ItemsSource = GetTreeItem(InputBox.Document);
                 CheckWordsInFlowDocument(InputBox.Document);
 
                 for (int i = 0; i < m_tags.Count; i++)
@@ -128,72 +128,7 @@ namespace tools
                     t.Word = word;
                     #region 设置高亮范围
                     t.StartPosition = GetPointer(flowDocument.ContentEnd, start, startPos);
-                    t.EndPosition = GetPointer(flowDocument.ContentEnd, t.StartPosition, endOffset);
-                    //var textLength = 0;
-                    //var startOffset = startPos;
-                    //var endOffset = word.Length;                    
-                    //while (start != null && flowDocument.ContentEnd.CompareTo(start) > -1)
-                    //{
-                    //    while (start.GetPointerContext(LogicalDirection.Forward) != TextPointerContext.Text)
-                    //    {
-                    //        TextPointerContext context = start.GetPointerContext(LogicalDirection.Forward);
-                    //        if (context == TextPointerContext.ElementEnd)
-                    //        {
-                    //            var next = start.GetNextContextPosition(LogicalDirection.Forward);
-                    //            if (next != null && next.GetPointerContext(LogicalDirection.Forward) == TextPointerContext.ElementEnd)
-                    //            {
-                    //                textLength += 2;
-                    //                startOffset -= 2;
-                    //                start = next;
-                    //            }
-                    //        }
-                    //        start = start.GetNextContextPosition(LogicalDirection.Forward);
-                    //    }
-                    //    var len = start.GetTextRunLength(LogicalDirection.Forward);
-                    //    if (textLength + len < startPos)
-                    //    {
-                    //        textLength += len;
-                    //        startOffset -= len;
-                    //        start = start.GetNextContextPosition(LogicalDirection.Forward);
-                    //    }
-                    //    else
-                    //    {
-                    //        break;
-                    //    }
-                    //}
-                    //t.StartPosition = start.GetPositionAtOffset(startOffset, LogicalDirection.Forward);
-                    //TextPointer end = t.StartPosition;
-                    //textLength = 0;
-                    //while (end != null && flowDocument.ContentEnd.CompareTo(end) > -1)
-                    //{
-                    //    while (end.GetPointerContext(LogicalDirection.Forward) != TextPointerContext.Text)
-                    //    {
-                    //        TextPointerContext context = end.GetPointerContext(LogicalDirection.Forward);
-                    //        if (context == TextPointerContext.ElementEnd)
-                    //        {
-                    //            var next = end.GetNextContextPosition(LogicalDirection.Forward);
-                    //            if (next != null && next.GetPointerContext(LogicalDirection.Forward) == TextPointerContext.ElementEnd)
-                    //            {
-                    //                textLength += 2;
-                    //                endOffset -= 2;
-                    //                end = next;
-                    //            }
-                    //        }
-                    //        end = end.GetNextContextPosition(LogicalDirection.Forward);
-                    //    }
-                    //    var len = end.GetTextRunLength(LogicalDirection.Forward);
-                    //    if (textLength + len < word.Length)
-                    //    {
-                    //        textLength += len;
-                    //        endOffset -= len;
-                    //        end = end.GetNextContextPosition(LogicalDirection.Forward);
-                    //    }
-                    //    else
-                    //    {
-                    //        break;
-                    //    }
-                    //}
-                    //t.EndPosition = end.GetPositionAtOffset(endOffset, LogicalDirection.Forward);
+                    t.EndPosition = GetPointer(flowDocument.ContentEnd, t.StartPosition, endOffset);                    
                     m_tags.Add(t);
                     #endregion
                     match = match.NextMatch();
@@ -254,8 +189,7 @@ namespace tools
                 {
                     case TextPointerContext.ElementStart:
                         //    start = start.GetNextContextPosition(LogicalDirection.Forward);
-                        //    model.Items = GetTreeItem(document ,ref start);
-                        
+                        //    model.Items = GetTreeItem(document ,ref start);                        
                     case TextPointerContext.None:
                     case TextPointerContext.ElementEnd:
                     //    return list;
