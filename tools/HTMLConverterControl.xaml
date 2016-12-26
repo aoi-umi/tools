@@ -28,7 +28,7 @@
                     <TextBlock DockPanel.Dock="Top">RichTextBox</TextBlock>
                     <UniformGrid Rows="1">
                         <RichTextBox IsReadOnly="True" Name="PreviewRichTextBox"></RichTextBox>
-                        <TreeView Name="PreviewTreeView">
+                        <!--<TreeView Name="PreviewTreeView">
                             <TreeView.ItemTemplate>
                                 <HierarchicalDataTemplate ItemsSource="{Binding Items}">
                                     <StackPanel>
@@ -36,7 +36,7 @@
                                     </StackPanel>
                                 </HierarchicalDataTemplate>
                             </TreeView.ItemTemplate>
-                        </TreeView>
+                        </TreeView>-->
                     </UniformGrid>
                 </DockPanel>
                 <DockPanel>

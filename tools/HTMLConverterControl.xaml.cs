@@ -42,7 +42,7 @@ namespace tools
             {
                 PreviewRichTextBox.Document = XamlReader.Parse(XamlBox.Text) as FlowDocument;
                 var start = PreviewRichTextBox.Document.ContentStart;
-                PreviewTreeView.ItemsSource = GetTreeItem(PreviewRichTextBox.Document, ref start);
+                //PreviewTreeView.ItemsSource = GetTreeItem(PreviewRichTextBox.Document, ref start);
 
             }
             catch (Exception ex)

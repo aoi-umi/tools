@@ -8,7 +8,8 @@
     <UserControl.Resources>
         <Style TargetType="TextBlock">
             <Setter Property="VerticalAlignment" Value="Center"/>
-            <Setter Property="HorizontalAlignment" Value="Left"/>
+            <Setter Property="HorizontalAlignment" Value="Right"/>
+            <Setter Property="Margin" Value="0,0,5,0"/>
         </Style>
         <Style TargetType="TextBox">
             <Setter Property="Margin" Value="0,2"/>
@@ -16,7 +17,8 @@
         </Style>
         <Style TargetType="CheckBox">
             <Setter Property="VerticalAlignment" Value="Center"/>
-            <Setter Property="HorizontalAlignment" Value="Left"/>
+            <Setter Property="HorizontalAlignment" Value="Right"/>
+            <Setter Property="Margin" Value="0,0,5,0"/>
         </Style>
     </UserControl.Resources>
     <Grid>
@@ -45,7 +47,7 @@
                             <TextBox Grid.Row="1" Grid.Column="1" Name="IgnoreIDName">ID</TextBox>
                             <TextBlock Grid.Row="2" Grid.Column="0" >表名</TextBlock>
                             <TextBox Grid.Row="2" Grid.Column="1" Name="TableBox"></TextBox>
-                            <TextBlock Grid.Row="3" Grid.Column="0" >变量前缀</TextBlock>
+                            <TextBlock Grid.Row="3" Grid.Column="0">变量前缀</TextBlock>
                             <TextBox Grid.Row="3" Grid.Column="1" Name="DataBasePreBox">@</TextBox>
                             <TextBlock Grid.Row="4" Grid.Column="0">去除字符串</TextBlock>
                             <TextBox Grid.Row="4" Grid.Column="1" Name="IgnoreCharForProcedure">[ ] "</TextBox>
