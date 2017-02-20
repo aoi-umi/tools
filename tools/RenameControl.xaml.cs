@@ -542,6 +542,7 @@ namespace tools
 
         private bool IsMouseOverTarget(Visual target, GetPositionDelegate getPosition)
         {
+            if (target == null) return false;
             Rect bounds = VisualTreeHelper.GetDescendantBounds(target);
             Point mousePos = getPosition((IInputElement)target);
             return bounds.Contains(mousePos);
