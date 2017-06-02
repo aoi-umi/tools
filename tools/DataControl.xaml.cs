@@ -6,6 +6,7 @@ using Newtonsoft.Json;
 using System.IO;
 using System.Linq;
 using System.Collections.Generic;
+using Newtonsoft.Json.Schema;
 
 namespace tools
 {
@@ -106,11 +107,11 @@ namespace tools
                     case "SplitString":
                         OutputString = ForSplitString(split);
                         break;
-                    case "RegReplaceString": 
+                    case "RegReplaceString":
                         OutputString = ForReplaceString(InputString);
                         break;
                     case "JsonBeautify":
-                        OutputString = ForBeautifyJsonString(InputString);
+                        OutputString = ForJsonBeautifyString(InputString);
                         break;
                 }
             }
@@ -336,7 +337,7 @@ namespace tools
             }
         }
 
-        private string ForBeautifyJsonString(string input)
+        private string ForJsonBeautifyString(string input)
         {
             try
             {
@@ -365,6 +366,22 @@ namespace tools
             catch (Exception ex)
             {
                 return ex.ToString();
+            }
+        }
+
+        private void ReplaceOption_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var type = (ReplaceOption.SelectedItem as ComboBoxItem)?.Tag.ToString();
+            switch (type)
+            {
+                case "Json2String":
+                    OldStringBox.Text = @"([\s]+)?""([\s\S]*?)""([\s]+)?";
+                    NewStringBox.Text = @"\\""$2\\""";
+                    break;
+                case "String2Json":
+                    OldStringBox.Text = @"\\""";
+                    NewStringBox.Text = @"""";
+                    break;
             }
         }
     }

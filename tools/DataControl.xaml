@@ -116,6 +116,7 @@
                             <Grid.RowDefinitions>
                                 <RowDefinition/>
                                 <RowDefinition/>
+                                <RowDefinition/>
                             </Grid.RowDefinitions>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="65"/>
@@ -127,6 +128,10 @@
                             <TextBlock Grid.Row="1" Grid.Column="0">新字符串</TextBlock>
                             <TextBox Grid.Row="1" Grid.Column="1" Name="NewStringBox"/>
                             <CheckBox Grid.Column="2" Name="IsMatchOnly" Content="仅获取匹配部分"/>
+                            <ComboBox Grid.Row="2" Grid.ColumnSpan="10" Name="ReplaceOption" IsReadOnly="True" IsEditable="True" SelectionChanged="ReplaceOption_SelectionChanged">
+                                <ComboBoxItem Content="json转为字符串" Tag="Json2String"/>
+                                <ComboBoxItem Content="字符串转为json" Tag="String2Json"/>
+                            </ComboBox>
                         </Grid>
                     </TabItem>
                     <TabItem Header="json格式化" Name="JsonBeautify"/>

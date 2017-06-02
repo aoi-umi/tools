@@ -12,6 +12,9 @@
             <TabItem Header="正则">
                 <my:RegexControl/>
             </TabItem>
+            <!--<TabItem Header="文本对比">
+                <my:TextCompareControl/>
+            </TabItem>-->
             <TabItem Header="批量重命名">
                 <my:RenameControl/>
             </TabItem>

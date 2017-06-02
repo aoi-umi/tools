@@ -22,9 +22,13 @@
         </Grid.ColumnDefinitions>
         <DockPanel>
                 <TextBlock DockPanel.Dock="Top">输入</TextBlock>
-                <RichTextBox Name="InputBox" TextChanged="Input_TextChanged" AcceptsReturn="True" AcceptsTab="True"/>
+                <RichTextBox Name="InputBox" TextChanged="Input_TextChanged" VerticalScrollBarVisibility="Auto" AcceptsReturn="True" AcceptsTab="True"/>
             </DockPanel>
-        <TextBox Grid.Row="0" Grid.Column="1" Name="OutputBox" IsReadOnly="True" Margin="5,15,0,0" IsTabStop="False"/>
+        <TextBox Grid.Row="0" Grid.Column="1" Name="OutputBox" VerticalScrollBarVisibility="Auto" IsReadOnly="True" Margin="5,15,0,0" IsTabStop="False"/>
+        <DockPanel Grid.Row="1" Grid.Column="0">
+            <TextBlock DockPanel.Dock="Top">正则</TextBlock>
+            <TextBox Name="RegexBox"  TextChanged="Input_TextChanged" VerticalScrollBarVisibility="Auto" AcceptsReturn="False" AcceptsTab="False"/>
+        </DockPanel>
         <UniformGrid Rows="1" Grid.Row="1" Grid.Column="1" Margin="5,15,0,0">
             <TreeView Name="OutputTreeView">
                 <TreeView.ItemTemplate>
@@ -45,9 +49,5 @@
                 </TreeView.ItemTemplate>
             </TreeView>-->
         </UniformGrid>
-        <DockPanel Grid.Row="1" Grid.Column="0">
-            <TextBlock DockPanel.Dock="Top">正则</TextBlock>
-            <TextBox Name="RegexBox"  TextChanged="Input_TextChanged" AcceptsReturn="False" AcceptsTab="False"/>
-        </DockPanel>
     </Grid>
 </UserControl>
