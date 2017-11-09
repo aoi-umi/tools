@@ -25,34 +25,6 @@
         <DockPanel>
             <StackPanel DockPanel.Dock="Top">
                 <TabControl Name="Tab">
-                    <TabItem Header="存储过程" Name="Procedure">
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition/>
-                                <RowDefinition/>
-                                <RowDefinition/>
-                                <RowDefinition/>
-                                <RowDefinition/>
-                            </Grid.RowDefinitions>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="65"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
-                            <CheckBox Grid.Row="0" Grid.Column="0" Name="UpdateBox">update</CheckBox>
-                            <ComboBox Grid.Row="0" Grid.Column="1" Name="DataBaseBox" SelectedIndex="0" IsEditable="True">
-                                <ComboBoxItem>sql server</ComboBoxItem>
-                                <ComboBoxItem>mysql</ComboBoxItem>
-                            </ComboBox>
-                            <CheckBox Grid.Row="1" Grid.Column="0" Name="IgnoreIDBox" IsChecked="True">忽略id</CheckBox>
-                            <TextBox Grid.Row="1" Grid.Column="1" Name="IgnoreIDName">ID</TextBox>
-                            <TextBlock Grid.Row="2" Grid.Column="0" >表名</TextBlock>
-                            <TextBox Grid.Row="2" Grid.Column="1" Name="TableBox"></TextBox>
-                            <TextBlock Grid.Row="3" Grid.Column="0">变量前缀</TextBlock>
-                            <TextBox Grid.Row="3" Grid.Column="1" Name="DataBasePreBox">@</TextBox>
-                            <TextBlock Grid.Row="4" Grid.Column="0">去除字符串</TextBlock>
-                            <TextBox Grid.Row="4" Grid.Column="1" Name="IgnoreCharForProcedure">[ ] "</TextBox>
-                        </Grid>
-                    </TabItem>
                     <TabItem Header="C#模型" Name="CSharpModel">
                         <Grid>
                             <Grid.RowDefinitions>

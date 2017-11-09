@@ -18,7 +18,7 @@ namespace tools
         {
             InitializeComponent();
             InputString = "http://127.0.0.1\rhosthttp://127.0.0.2\r\n<a href=\"http://127.0.0.3\">http://127.0.0.3</a>\nhttp://127.0.0.1";
-            RegexString = @"(?<!<a.*)(?:http|https)://[^\s]+";
+            RegexString = @"(?<!<a.*)(?<protocol>(?:http|https))://(?<address>[^\s]+)";
             OutputTreeView.ItemsSource = dataList;
         }
         private string InputString
@@ -107,22 +107,23 @@ namespace tools
                 TextPointer navigator = flowDocument.ContentStart;
                 var text = InputString;
                 if (string.IsNullOrEmpty(text)) return;
-                Match match = Regex.Match(text, RegexString);
-                int matchNum = 1;
+                var reg = new Regex(RegexString);
+                var nameList = reg.GetGroupNames();
+                Match match = reg.Match(text);
+                var matchNum = 1;
                 while (match.Success)
                 {
                     TextPointer start = InputBox.Document.ContentStart;
                     string word = match.Groups[0].ToString();
                     int startPos = match.Index, endOffset = word.Length;
 
-                    var model = new TreeViewItemModel() { Index = startPos, Header = "match" + matchNum + ",Index(" + startPos.ToString() + ")" };
-                    int groupNum = 0;
-                    foreach (var g in match.Groups)
+                    var model = new TreeViewItemModel() { Index = startPos, Header = $"match{matchNum},Index({startPos.ToString()})" };
+                    var groupNum = 0;
+                    foreach (Capture g in match.Groups)
                     {
-                        model.Items.Add(new TreeViewItemModel() { Header = "group" + groupNum + ": " + g.ToString() });
-                        ++groupNum;
+                        model.Items.Add(new TreeViewItemModel() { Header = $"group[{groupNum}]<{reg.GroupNameFromNumber(groupNum)}>: {g.Value}" });
+                        groupNum++;
                     }
-                    ++matchNum;
                     dataList.Add(model);
 
                     Tag t = new Tag();
@@ -133,6 +134,7 @@ namespace tools
                     m_tags.Add(t);
                     #endregion
                     match = match.NextMatch();
+                    matchNum++;
                 }
             }
             catch (Exception ex)

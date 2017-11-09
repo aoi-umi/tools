@@ -29,37 +29,9 @@ namespace tools
             set { outputBox.Text = value; }
         }
 
-        private string DataBaseName
-        {
-            get { return DataBaseBox.Text; }
-        }
-
-        private string DataBasePre
-        {
-            get { return DataBasePreBox.Text; }
-        }
-
-        private string TableName
-        {
-            get { return TableBox.Text; }
-        }
-
         private string ModelName
         {
             get { return ModelBox.Text; }
-        }
-
-        private string IgnoreIdName
-        {
-            get
-            {
-                return IgnoreIDName.Text.Trim();
-            }
-        }
-
-        private string IgnoreCharForProcedureString
-        {
-            get { return IgnoreCharForProcedure.Text; }
         }
 
         private string IgnoreCharForCSharpModelString
@@ -95,9 +67,6 @@ namespace tools
                 var split = InputString.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
                 switch (ti.Name)
                 {
-                    case "Procedure":
-                        OutputString = ForProcedure(split);
-                        break;
                     case "CSharpModel":
                         OutputString = ForCSharpModel(split);
                         break;
@@ -114,84 +83,6 @@ namespace tools
                         OutputString = ForJsonBeautifyString(InputString);
                         break;
                 }
-            }
-        }
-
-        private string ForProcedure(string[] split)
-        {
-            string p = string.Empty;
-            string beginif = string.Empty;
-            string endIf = string.Empty;
-            string endWholeIf = string.Empty;
-            string beginelse = string.Empty;
-            string endelse = string.Empty;
-            switch (DataBaseName)
-            {
-                case "sql server": p = "CREATE PROCEDURE p_" + TableName + "_Save\r\n{0}AS\r\nBEGIN\r\n\tSET NOCOUNT ON;\r\n{1}END\r\nGO\r\n";
-                    beginif = beginelse = "BEGIN\r\n";
-                    endIf = endWholeIf = "\tEND\r\n"; break;
-                case "mysql": p = "CREATE PROCEDURE p_" + TableName + "_Save\r\n{0}BEGIN\r\n{1}END\r\n";
-                    beginif = "THEN\r\n";
-                    endWholeIf = "\tEND IF;\r\n";
-                    break;
-            }
-            string args = "(\r\n";
-            var insertString = "\tIF " + DataBasePre + IgnoreIdName + " is null or " + DataBasePre + IgnoreIdName + " = 0\r\n\t" + beginif + "\tINSERT  INTO " + TableName + "(\r\n";
-            try
-            {
-                foreach (var s in split)
-                {
-                    var a = s.Trim().Split(new char[] { ' ', '\t', ',' }, StringSplitOptions.RemoveEmptyEntries);
-                    if (a.Length < 2) throw new Exception("\r\n请按\r\narg1 int\r\narg2 int\r\n...\r\n的格式输入");
-                    args += DataBasePre + a[0] + " " + a[1] + ",\r\n";
-                    if ((bool)IgnoreIDBox.IsChecked && s.Trim().Split(' ')[0].ToLower() == IgnoreIdName.ToLower())
-                    {
-                        continue;
-                    }
-                    insertString += "\t" + s.Trim().Split(' ')[0] + ",\r\n";
-                }
-                if (insertString.EndsWith(",\r\n"))
-                {
-                    insertString = insertString.Remove(insertString.Length - 3, 1);
-                }
-                if (args.EndsWith(",\r\n"))
-                {
-                    args = args.Remove(args.Length - 3, 1);
-                }
-                args += ")\r\n";
-
-                insertString += "\t)\r\n\tVALUES(\r\n";
-                var updateString = "\tELSE \r\n\t" + beginelse + "\tUPDATE " + TableName + "\r\n\tSET\r\n";
-                foreach (var s in split)
-                {
-                    if ((bool)IgnoreIDBox.IsChecked && s.Trim().Split(' ')[0].ToLower() == IgnoreIdName.ToLower())
-                    {
-                        continue;
-                    }
-                    insertString += "\t" + DataBasePre + s.Trim().Split(' ')[0] + ",\r\n";
-                    updateString += "\t" + s.Trim().Split(' ')[0] + " = " + DataBasePre + s.Trim().Split(' ')[0] + ",\r\n";
-                }
-                if (insertString.EndsWith(",\r\n"))
-                {
-                    insertString = insertString.Remove(insertString.Length - 3, 1);
-                }
-                if (updateString.EndsWith(",\r\n"))
-                {
-                    updateString = updateString.Remove(updateString.Length - 3, 1);
-                }
-                insertString += "\t);\r\n";
-                updateString += "\tWHERE " + IgnoreIdName + " = " + DataBasePre + IgnoreIdName + "\r\n" + endWholeIf;
-                var output = string.Format(p, args, insertString + ((bool)UpdateBox.IsChecked ? updateString : endWholeIf));
-                var ignore = IgnoreCharForProcedureString.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                foreach (string i in ignore)
-                {
-                    output = output.Replace(i, "");
-                }
-                return output;
-            }
-            catch (Exception ex)
-            {
-                return ex.ToString();
             }
         }
 
