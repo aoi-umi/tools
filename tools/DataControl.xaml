@@ -20,6 +20,10 @@
             <Setter Property="HorizontalAlignment" Value="Right"/>
             <Setter Property="Margin" Value="0,0,5,0"/>
         </Style>
+        <DataTemplate x:Key="regOptTemp">
+            <CheckBox Content="{Binding RegexOptionName}" IsChecked="{Binding Selected}">
+            </CheckBox>
+        </DataTemplate>
     </UserControl.Resources>
     <Grid>
         <DockPanel>
@@ -89,6 +93,7 @@
                                 <RowDefinition/>
                                 <RowDefinition/>
                                 <RowDefinition/>
+                                <RowDefinition/>
                             </Grid.RowDefinitions>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="65"/>
@@ -99,11 +104,19 @@
                             <TextBox Grid.Row="0" Grid.Column="1" Name="OldStringBox"/>
                             <TextBlock Grid.Row="1" Grid.Column="0">新字符串</TextBlock>
                             <TextBox Grid.Row="1" Grid.Column="1" Name="NewStringBox"/>
-                            <CheckBox Grid.Column="2" Name="IsMatchOnly" Content="仅获取匹配部分"/>
+                            <CheckBox Grid.Column="2" Name="IsMatchOnly" Content="仅获取匹配部分" Margin="5 0"/>
                             <ComboBox Grid.Row="2" Grid.ColumnSpan="10" Name="ReplaceOption" IsReadOnly="True" IsEditable="True" SelectionChanged="ReplaceOption_SelectionChanged">
                                 <ComboBoxItem Content="json转为字符串" Tag="Json2String"/>
                                 <ComboBoxItem Content="字符串转为json" Tag="String2Json"/>
                             </ComboBox>
+                            <TextBlock Grid.Row="3">正则参数</TextBlock>
+                            <ListView Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="10" Name="RegOptBox" ItemTemplate="{StaticResource regOptTemp}" BorderThickness="0" Background="Transparent">
+                                <ListView.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <StackPanel Orientation="Horizontal"></StackPanel>
+                                    </ItemsPanelTemplate>
+                                </ListView.ItemsPanel>
+                            </ListView>
                         </Grid>
                     </TabItem>
                     <TabItem Header="json格式化" Name="JsonBeautify"/>

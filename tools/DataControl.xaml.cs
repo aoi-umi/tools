@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Collections.Generic;
 using Newtonsoft.Json.Schema;
+using System.ComponentModel;
 
 namespace tools
 {
@@ -15,9 +16,20 @@ namespace tools
     /// </summary>
     public partial class DataControl : UserControl
     {
+        List<RegexOptionModel> regexOptionsList;
         public DataControl()
         {
             InitializeComponent();
+            regexOptionsList = new List<RegexOptionModel>();
+            foreach (var val in Enum.GetValues(typeof(RegexOptions))) {
+                var enumVal = (RegexOptions)val;
+                if (enumVal != RegexOptions.None) {
+                    regexOptionsList.Add(new RegexOptionModel() {
+                        RegexOption = enumVal
+                    });
+                }
+            }
+            RegOptBox.ItemsSource = regexOptionsList;
         }
         private string InputString
         {
@@ -210,9 +222,16 @@ namespace tools
             string output = string.Empty;
             try
             {
+                var regOptions = RegexOptions.None;
+                foreach (var item in RegOptBox.Items)
+                {
+                    var val = item as RegexOptionModel;
+                    if (val.Selected)
+                        regOptions = regOptions | val.RegexOption;
+                }
                 if ((bool)IsMatchOnly.IsChecked)
                 {
-                    var match = Regex.Match(input, OldStringBox.Text);
+                    var match = Regex.Match(input, OldStringBox.Text, regOptions);
                     for (; match.Success; match = match.NextMatch())
                     {
                         output += Regex.Replace(match.Groups[0].ToString(), OldStringBox.Text, Regex.Unescape(NewStringBox.Text));
@@ -220,7 +239,7 @@ namespace tools
                     return output;
                 }
                 else
-                    return Regex.Replace(input, OldStringBox.Text, Regex.Unescape(NewStringBox.Text));
+                    return Regex.Replace(input, OldStringBox.Text, Regex.Unescape(NewStringBox.Text), regOptions);
             }
             catch (Exception ex)
             {
@@ -275,5 +294,33 @@ namespace tools
                     break;
             }
         }
+    }
+
+    class RegexOptionModel: INotifyPropertyChanged
+    {
+        public RegexOptions RegexOption;
+        public string RegexOptionName {
+            get{
+                return RegexOption.ToString();
+            }
+        }
+
+        private bool selected;
+        public bool Selected
+        {
+            get { return selected; }
+            set
+            {
+                if (selected != value)
+                {
+                    selected = value;
+                    if (PropertyChanged != null)
+                    {
+                        PropertyChanged(this, new PropertyChangedEventArgs("Selected"));
+                    }
+                }
+            }
+        }
+        public event PropertyChangedEventHandler PropertyChanged;
     }
 }
