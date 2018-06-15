@@ -39,17 +39,7 @@ namespace tools
         private string OutputString
         {
             set { outputBox.Text = value; }
-        }
-
-        private string ModelName
-        {
-            get { return ModelBox.Text; }
-        }
-
-        private string IgnoreCharForCSharpModelString
-        {
-            get { return IgnoreCharForCSharpModel.Text; }
-        }
+        }        
 
         private string IgnoreCharForPreAndSufString
         {
@@ -79,9 +69,6 @@ namespace tools
                 var split = InputString.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
                 switch (ti.Name)
                 {
-                    case "CSharpModel":
-                        OutputString = ForCSharpModel(split);
-                        break;
                     case "AddPreAndSuf":
                         OutputString = ForAddPreAndSuf(split);
                         break;
@@ -96,77 +83,7 @@ namespace tools
                         break;
                 }
             }
-        }
-
-        private string ForCSharpModel(string[] split)
-        {
-            try
-            {
-                string modelString = "[Serializable]\r\n[DataContract]\r\npublic class {0}\r\n{{\r\n{1}}}";
-                string args = "";
-                foreach (var s in split)
-                {
-                    var a = s.Trim().Replace(",", "").Replace("not null", "").Replace("null", "").Split(new char[] { ' ','\t' }, StringSplitOptions.RemoveEmptyEntries);
-                    if (a.Length < 2) throw new Exception("\r\n请按\r\narg1 int\r\narg2 int\r\n...\r\n或\r\n描述 arg1 int\r\n描述 arg2 int\r\n...\r\n的格式输入");
-                    string description = string.Empty;
-                    string name = string.Empty;
-                    string type = string.Empty;
-                    if (a.Length == 2)
-                    {
-                        name = a[0];
-                        type = a[1].ToLower();
-                    }
-                    else
-                    {
-                        description = a[0];
-                        name = a[1];
-                        type = a[2].ToLower();
-                    }
-                    if(!string.IsNullOrEmpty(description)) args += "/// <summary>\r\n/// " + description + "\r\n/// </summary>\r\n";
-                    args += "[DataMember]\r\npublic ";
-                    if (type.IndexOf("int") >= 0 || type.IndexOf("tinyint") >= 0)
-                    {
-                        args += " int " + name;
-                    }
-                    else if (type.IndexOf("varchar") >= 0)
-                    {
-                        args += " string " + name;
-                    }
-                    else if (type.IndexOf("float") >= 0)
-                    {
-                        args += " double " + name;
-                    }
-                    else if (type.IndexOf("decimal") >= 0)
-                    {
-                        args += " decimal " + name;
-                    }
-                    else if (type.IndexOf("bit") >= 0)
-                    {
-                        args += " bool " + name;
-                    }
-                    else if (type.IndexOf("datetime") >= 0)
-                    {
-                        args += " DateTime " + name;
-                    }
-                    else
-                    {
-                        args += " undefined " + name;
-                    }
-                    args += " { get; set; }\r\n\r\n";
-                }
-                var output = string.Format(modelString, ModelName, args);
-                var ignore = IgnoreCharForCSharpModelString.Split(new char[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries);
-                foreach (string i in ignore)
-                {
-                    output = output.Replace(i, "");
-                }
-                return output;
-            }
-            catch (Exception ex)
-            {
-                return ex.ToString();
-            }
-        }
+        }        
 
         private string ForAddPreAndSuf(string[] split)
         {

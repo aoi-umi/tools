@@ -29,22 +29,6 @@
         <DockPanel>
             <StackPanel DockPanel.Dock="Top">
                 <TabControl Name="Tab">
-                    <TabItem Header="C#模型" Name="CSharpModel">
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition/>
-                                <RowDefinition/>
-                            </Grid.RowDefinitions>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="65"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Row="0" Grid.Column="0">Model名</TextBlock>
-                            <TextBox Grid.Row="0" Grid.Column="1"  Name="ModelBox"></TextBox>
-                            <TextBlock Grid.Row="1" Grid.Column="0">去除字符串</TextBlock>
-                            <TextBox Grid.Row="1" Grid.Column="1" Name="IgnoreCharForCSharpModel">" @</TextBox>              
-                        </Grid>
-                    </TabItem>
                     <TabItem Header="增加前缀后缀" Name="AddPreAndSuf">
                         <Grid>
                             <Grid.RowDefinitions>
