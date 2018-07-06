@@ -39,26 +39,11 @@ namespace tools
         private string OutputString
         {
             set { outputBox.Text = value; }
-        }        
-
-        private string IgnoreCharForPreAndSufString
-        {
-            get { return IgnoreCharForPreAndSuf.Text; }
-        }
+        }                
 
         private string IgnoreCharForSplitString
         {
             get { return IgnoreCharForSplit.Text; }
-        }
-
-        private string Prefix
-        {
-            get { return Pre.Text; }
-        }
-
-        private string Suffix
-        {
-            get { return Suf.Text; }
         }        
 
         private void MakeButton_Click(object sender, RoutedEventArgs e)
@@ -69,9 +54,6 @@ namespace tools
                 var split = InputString.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
                 switch (ti.Name)
                 {
-                    case "AddPreAndSuf":
-                        OutputString = ForAddPreAndSuf(split);
-                        break;
                     case "SplitString":
                         OutputString = ForSplitString(split);
                         break;
@@ -83,30 +65,7 @@ namespace tools
                         break;
                 }
             }
-        }        
-
-        private string ForAddPreAndSuf(string[] split)
-        {
-            string output = string.Empty;
-            try
-            {
-                foreach (var s in split)
-                {
-                    //var a = s.Trim().Split(new char[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries);
-                    output += Prefix + s.Trim() + Suffix + "\r\n";
-                }
-                var ignore = IgnoreCharForPreAndSufString.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                foreach (string i in ignore)
-                {
-                    output = output.Replace(i, "");
-                }
-                return output;
-            }
-            catch (Exception ex)
-            {
-                return ex.ToString();
-            }
-        }
+        }                
 
         private string ForSplitString(string[] split)
         {
@@ -146,17 +105,29 @@ namespace tools
                     if (val.Selected)
                         regOptions = regOptions | val.RegexOption;
                 }
-                if ((bool)IsMatchOnly.IsChecked)
+                List<string> list; ;
+                if (SplitLine.IsChecked == true)
                 {
-                    var match = Regex.Match(input, OldStringBox.Text, regOptions);
-                    for (; match.Success; match = match.NextMatch())
-                    {
-                        output += Regex.Replace(match.Groups[0].ToString(), OldStringBox.Text, Regex.Unescape(NewStringBox.Text));
-                    }
-                    return output;
+                    list = input.Split(new String[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries).ToList();
                 }
                 else
-                    return Regex.Replace(input, OldStringBox.Text, Regex.Unescape(NewStringBox.Text), regOptions);
+                {
+                    list = new List<string>() { input };
+                }
+                list.ForEach(str =>
+                {
+                    if (IsMatchOnly.IsChecked == true)
+                    {
+                        var match = Regex.Match(str, OldStringBox.Text, regOptions);
+                        for (; match.Success; match = match.NextMatch())
+                        {
+                            output += Regex.Replace(match.Groups[0].ToString(), OldStringBox.Text, Regex.Unescape(NewStringBox.Text));
+                        }
+                    }
+                    else
+                        output += Regex.Replace(str, OldStringBox.Text, Regex.Unescape(NewStringBox.Text), regOptions);
+                });
+                return output;
             }
             catch (Exception ex)
             {
@@ -208,6 +179,11 @@ namespace tools
                 case "String2Json":
                     OldStringBox.Text = @"\\""";
                     NewStringBox.Text = @"""";
+                    break;
+                case "PrefixAndSuffix":
+                    this.SplitLine.IsChecked = true;
+                    OldStringBox.Text = @"^\s*([\s\S]+?)\s*$";
+                    NewStringBox.Text = @"pre.$1.suf\r\n";
                     break;
             }
         }

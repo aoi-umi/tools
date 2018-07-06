@@ -29,27 +29,6 @@
         <DockPanel>
             <StackPanel DockPanel.Dock="Top">
                 <TabControl Name="Tab">
-                    <TabItem Header="增加前缀后缀" Name="AddPreAndSuf">
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition/>
-                                <RowDefinition/>
-                                <RowDefinition/>
-                            </Grid.RowDefinitions>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="65"/>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="65"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Row="0" Grid.Column="0">前缀</TextBlock>
-                            <TextBox Grid.Row="0" Grid.Column="1" Name="Pre"></TextBox>
-                            <TextBlock Grid.Row="0" Grid.Column="2">后缀</TextBlock>
-                            <TextBox Grid.Row="0" Grid.Column="3" Name="Suf"></TextBox>
-                            <TextBlock Grid.Row="1" Grid.Column="0">去除字符串</TextBlock>
-                            <TextBox Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="3" Name="IgnoreCharForPreAndSuf">" @</TextBox>                      
-                        </Grid>
-                    </TabItem>
                     <TabItem Header="按字符串切割" Name="SplitString">
                         <Grid>
                             <Grid.RowDefinitions>
@@ -78,6 +57,7 @@
                                 <RowDefinition/>
                                 <RowDefinition/>
                                 <RowDefinition/>
+                                <RowDefinition/>
                             </Grid.RowDefinitions>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="65"/>
@@ -88,13 +68,26 @@
                             <TextBox Grid.Row="0" Grid.Column="1" Name="OldStringBox"/>
                             <TextBlock Grid.Row="1" Grid.Column="0">新字符串</TextBlock>
                             <TextBox Grid.Row="1" Grid.Column="1" Name="NewStringBox"/>
-                            <CheckBox Grid.Column="2" Name="IsMatchOnly" Content="仅获取匹配部分" Margin="5 0"/>
-                            <ComboBox Grid.Row="2" Grid.ColumnSpan="10" Name="ReplaceOption" IsReadOnly="True" IsEditable="True" SelectionChanged="ReplaceOption_SelectionChanged">
+                            <ListView Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="10" BorderThickness="0" Background="Transparent">
+                                <ListView.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <StackPanel Orientation="Horizontal"></StackPanel>
+                                    </ItemsPanelTemplate>
+                                </ListView.ItemsPanel>
+                                <ListViewItem>
+                                    <CheckBox Name="IsMatchOnly" Content="仅获取匹配部分"/>
+                                </ListViewItem>
+                                <ListViewItem>
+                                    <CheckBox Name="SplitLine" Content="按行匹配"/>
+                                </ListViewItem>
+                            </ListView>
+                            <ComboBox Grid.Row="3" Grid.ColumnSpan="10" Name="ReplaceOption" IsReadOnly="True" IsEditable="True" SelectionChanged="ReplaceOption_SelectionChanged">
                                 <ComboBoxItem Content="json转为字符串" Tag="Json2String"/>
                                 <ComboBoxItem Content="字符串转为json" Tag="String2Json"/>
+                                <ComboBoxItem Content="增加前后缀" Tag="PrefixAndSuffix"/>
                             </ComboBox>
-                            <TextBlock Grid.Row="3">正则参数</TextBlock>
-                            <ListView Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="10" Name="RegOptBox" ItemTemplate="{StaticResource regOptTemp}" BorderThickness="0" Background="Transparent">
+                            <TextBlock Grid.Row="4">正则参数</TextBlock>
+                            <ListView Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="10" Name="RegOptBox" ItemTemplate="{StaticResource regOptTemp}" BorderThickness="0" Background="Transparent">
                                 <ListView.ItemsPanel>
                                     <ItemsPanelTemplate>
                                         <StackPanel Orientation="Horizontal"></StackPanel>
