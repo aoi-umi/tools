@@ -189,7 +189,7 @@ namespace tools
         }
     }
 
-    class RegexOptionModel: INotifyPropertyChanged
+    class RegexOptionModel: NotifyPropertyChanged
     {
         public RegexOptions RegexOption;
         public string RegexOptionName {
@@ -207,13 +207,9 @@ namespace tools
                 if (selected != value)
                 {
                     selected = value;
-                    if (PropertyChanged != null)
-                    {
-                        PropertyChanged(this, new PropertyChangedEventArgs("Selected"));
-                    }
+                    MyPropertyChanged("Selected");
                 }
             }
         }
-        public event PropertyChangedEventHandler PropertyChanged;
     }
 }

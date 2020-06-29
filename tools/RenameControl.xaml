@@ -24,7 +24,7 @@
         </Style>
     </UserControl.Resources>
     <Grid>
-        <DockPanel>
+        <DockPanel Name="MainBox">
             <GroupBox Header="从文件夹获取" DockPanel.Dock="Top">
                 <Grid>
                     <Grid.RowDefinitions>
@@ -38,16 +38,16 @@
                         <ColumnDefinition Width="auto"/>
                     </Grid.ColumnDefinitions>
                     <TextBlock Text="文件夹"/>
-                    <TextBox Grid.Column="1" Name="PathBox" PreviewDrop="PathBox_PreviewDrop"  PreviewDragOver="PathBox_PreviewDragOver"/>
+                    <TextBox Grid.Column="1" Name="PathBox" Text="{Binding FilePath}"  PreviewDrop="PathBox_PreviewDrop"  PreviewDragOver="PathBox_PreviewDragOver"/>
                     <UniformGrid Grid.Column="2" Columns="2">
-                        <Button Click="GetFileList_Click">获取</Button>
-                        <Button Click="GetFileListAfterClear_Click">清除并获取</Button>
+                        <Button Click="GetFileList_Click" IsEnabled="{Binding IsEnabled}">获取</Button>
+                        <Button Click="GetFileListAfterClear_Click" IsEnabled="{Binding IsEnabled}">清除并获取</Button>
                     </UniformGrid>
                     <TextBlock Grid.Row="1" Text="过滤"/>
                     <TextBox Grid.Row="1" Grid.Column="1" Name="FilterBox"/>
                     <CheckBox Name="IsGetMatchBox" Grid.Row="1" Grid.Column="2" >获取匹配</CheckBox>
                     <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal" Margin="0,4,0,0">
-                        <CheckBox Name="IsGetFileBox" Content="获取文件" IsChecked="True"/>
+                        <CheckBox Name="IsGetFileBox" Content="获取文件" IsChecked="True" />
                         <CheckBox Name="IsGetFolderBox" Content="获取文件夹"/>
                         <CheckBox Name="IsGetChildDirBox">包括子文件夹</CheckBox>
                     </StackPanel>
