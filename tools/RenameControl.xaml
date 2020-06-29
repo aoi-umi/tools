@@ -44,12 +44,12 @@
                         <Button Click="GetFileListAfterClear_Click" IsEnabled="{Binding IsEnabled}">清除并获取</Button>
                     </UniformGrid>
                     <TextBlock Grid.Row="1" Text="过滤"/>
-                    <TextBox Grid.Row="1" Grid.Column="1" Name="FilterBox"/>
-                    <CheckBox Name="IsGetMatchBox" Grid.Row="1" Grid.Column="2" >获取匹配</CheckBox>
+                    <TextBox Grid.Row="1" Grid.Column="1" Name="FilterBox" Text="{Binding FilterString}"/>
+                    <CheckBox Name="IsGetMatchBox" Grid.Row="1" Grid.Column="2" IsChecked="{Binding IsGetMatch}">获取匹配</CheckBox>
                     <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal" Margin="0,4,0,0">
-                        <CheckBox Name="IsGetFileBox" Content="获取文件" IsChecked="True" />
-                        <CheckBox Name="IsGetFolderBox" Content="获取文件夹"/>
-                        <CheckBox Name="IsGetChildDirBox">包括子文件夹</CheckBox>
+                        <CheckBox Name="IsGetFileBox" Content="获取文件" IsChecked="{Binding IsGetFile}"/>
+                        <CheckBox Name="IsGetFolderBox" Content="获取文件夹" IsChecked="{Binding IsGetFolder}"/>
+                        <CheckBox Name="IsGetChildDirBox" IsChecked="{Binding IsGetChildDir}">包括子文件夹</CheckBox>
                     </StackPanel>
                 </Grid>
             </GroupBox>
@@ -116,12 +116,12 @@
                     <Button Content="预览" Click="Preview_Click"/>
                 </StackPanel>
             </GroupBox>
-            <TextBlock Name="StatusMessageBox" DockPanel.Dock="Bottom" Text="文件数：0"/>
+            <TextBlock Name="StatusMessageBox" DockPanel.Dock="Bottom" Text="{Binding StatusMessage}"/>
             <UniformGrid DockPanel.Dock="Bottom" Rows="1" Margin="0,5">
                 <Button Click="Rename_Click">重命名</Button>
                 <Button Click="Clear_Click">清除</Button>
             </UniformGrid>
-            <ListView Name="FileListView" AllowDrop="True" Drop="FileListView_Drop" KeyUp="FileListView_KeyUp" MouseMove="FileListView_MouseMove">
+            <ListView Name="FileListView" AllowDrop="True" Drop="FileListView_Drop" KeyUp="FileListView_KeyUp" MouseMove="FileListView_MouseMove" PreviewMouseDown="FileListView_PreviewMouseDown">
                 <ListView.View>                    
                     <GridView>
                         <GridViewColumn Header="路径" Width="80">

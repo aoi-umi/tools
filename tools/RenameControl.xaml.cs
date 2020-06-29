@@ -11,6 +11,7 @@ using System.Windows.Media;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace tools {
     /// <summary>
@@ -26,7 +27,7 @@ namespace tools {
             bgWorker.RunWorkerCompleted += BgWorker_RunWorkerCompleted;
             FileListView.ItemsSource = FileList;
             CurrView = RenameByNewNameView;
-            MainBox.DataContext = stateModel;
+            MainBox.DataContext = state;
             AddCharset();
             ViewList = new List<ViewModel>() {
             new ViewModel(){
@@ -52,80 +53,63 @@ namespace tools {
         };
         }
         private List<ViewModel> ViewList;
-        private StateModel stateModel = new StateModel()
+        private StateModel state = new StateModel()
         {
             //IsEnabled = true
+            StatusMessage = "文件数：0"
         };
 
         private BackgroundWorker bgWorker { get; set; }
-
-        private string FilePath {
-            get { return stateModel.FilePath; }
-            set { stateModel.FilePath = value; }
-        }
-
-        private string FilterString {
-            get { return FilterBox.Text; }
-            set { if (FilterBox.Text != value) FilterBox.Text = value; }
-        }
-
-        private bool IsGetMatch {
-            get { return (bool)IsGetMatchBox.IsChecked; }
-        }
-
-        private bool IsGetFile {
-            get { return (bool)IsGetFileBox.IsChecked; }
-        }
-
-        private bool IsGetFolder {
-            get { return (bool)IsGetFolderBox.IsChecked; }
-        }
-
-        private bool IsGetChildDir {
-            get { return (bool)IsGetChildDirBox.IsChecked; }
-        }
-
-        private string StatusMessage {
-            set { StatusMessageBox.Text = value + " (" + DateTime.Now + ")"; }
+        private void SetStatusMessage(string value) {
+            state.StatusMessage = $"{value} ({DateTime.Now})";
         }
 
         private UIElement CurrView { get; set; }
 
         private ObservableCollection<FileInfoModel> FileList { get; set; }
 
+        private bool NotMatch(string name) {
+            if (string.IsNullOrEmpty(state.FilterString))
+                return false;
+            bool match = Regex.IsMatch(name, state.FilterString);
+            return (state.IsGetMatch && !match) || (!state.IsGetMatch && match);
+        }
         private void GetFileList(string path) {
             DirectoryInfo folder = new DirectoryInfo(path);
-            if (IsGetChildDir) {
+            if (state.IsGetChildDir) {
                 foreach (DirectoryInfo CurrFolder in folder.GetDirectories()) {
+                    if (NotMatch(CurrFolder.Name)) continue;
                     GetFileList(CurrFolder.FullName);
                 }
             }
-            if (IsGetFile) {
+            if (state.IsGetFile) {
                 foreach (FileInfo CurrFile in folder.GetFiles()) {
-                    if (!string.IsNullOrEmpty(FilterString)) {
-                        bool match = Regex.IsMatch(CurrFile.Name, FilterString);
-                        if ((IsGetMatch && !match) || (!IsGetMatch && match)) continue;
-                    }
-                    FileList.Add(new FileInfoModel()
+                    if (NotMatch(CurrFile.Name)) continue;
+                    AddFile(new FileInfoModel()
                     {
                         Path = CurrFile.DirectoryName,
                         OldFilename = CurrFile.Name
                     });
                 }
             }
-            if (IsGetFolder) {
+            if (state.IsGetFolder) {
                 foreach (DirectoryInfo CurrFolder in folder.GetDirectories()) {
-                    if (!string.IsNullOrEmpty(FilterString)) {
-                        if (Regex.IsMatch(CurrFolder.Name, FilterString)) continue;
-                    }
-                    FileList.Add(new FileInfoModel()
+                    if (NotMatch(CurrFolder.Name)) continue;
+                    AddFile(new FileInfoModel()
                     {
                         Path = CurrFolder.Parent.FullName,
                         OldFilename = CurrFolder.Name
                     });
                 }
             }
-            StatusMessage = "文件数：" + FileList.Count;
+
+            SetStatusMessage("文件数：" + FileList.Count);
+        }
+
+        private void AddFile(FileInfoModel model) {
+            Application.Current.Dispatcher.Invoke(delegate {
+                FileList.Add(model);
+            });
         }
 
         private string GetSuf(string str) {
@@ -156,12 +140,19 @@ namespace tools {
             MessageBox.Show(message);
         }
 
+        private void ResetFileInfo(FileInfoModel fileinfo) {
+            fileinfo.NewFilename = "";
+            fileinfo.IsCreateNewDir = false;
+            fileinfo.NewDir = "";
+            fileinfo.Status = "";
+        }
         private void PreviewByNewName() {
             int Num;
             int NumLen = NumBox.Text.Length;
             string Suf = SufBox.Text.Trim();
             if (!int.TryParse(NumBox.Text, out Num)) { NumBox.Focus(); throw new Exception("请输入正确整数"); }
             foreach (var fileinfo in FileList) {
+                ResetFileInfo(fileinfo);
                 string NewSuf = string.Empty;
                 if (!string.IsNullOrEmpty(Suf)) NewSuf = "." + Suf;
                 else NewSuf = GetSuf(fileinfo.OldFilename);
@@ -171,19 +162,14 @@ namespace tools {
                 else
                     fileinfo.NewFilename = string.Format("{0}{1}{2}", NewNameBox.Text, Num.ToString("D" + NumLen), NewSuf);
                 ++Num;
-                fileinfo.IsCreateNewDir = false;
-                fileinfo.NewDir = "";
-                fileinfo.Status = "";
             }
         }
 
         private void PreviewByReplace() {
             try {
                 foreach (var fileinfo in FileList) {
+                    ResetFileInfo(fileinfo);
                     fileinfo.NewFilename = Regex.Replace(fileinfo.OldFilename, OldStringBox.Text, NewStringBox.Text);
-                    fileinfo.IsCreateNewDir = false;
-                    fileinfo.NewDir = "";
-                    fileinfo.Status = "";
                 }
             } catch (Exception ex) {
                 ShowMessage(ex.ToString());
@@ -195,10 +181,8 @@ namespace tools {
             Encoding encoding = Encoding.GetEncoding(charset);
             Encoding defaultEncoding = Encoding.Default;
             foreach (var fileinfo in FileList) {
+                ResetFileInfo(fileinfo);
                 fileinfo.NewFilename = encoding.GetString(defaultEncoding.GetBytes(fileinfo.OldFilename));
-                fileinfo.IsCreateNewDir = false;
-                fileinfo.NewDir = "";
-                fileinfo.Status = "";
             }
         }
 
@@ -206,6 +190,7 @@ namespace tools {
             int InsertIndex;
             if (!int.TryParse(InsertIndexBox.Text, out InsertIndex)) { InsertIndexBox.Focus(); throw new Exception("请输入正确整数"); }
             foreach (var fileinfo in FileList) {
+                ResetFileInfo(fileinfo);
                 int SufIndex = fileinfo.OldFilename.LastIndexOf(".");
                 string Name = SufIndex >= 0 ? fileinfo.OldFilename.Substring(0, SufIndex) : fileinfo.OldFilename;
                 string Suf = GetSuf(fileinfo.OldFilename);
@@ -213,9 +198,6 @@ namespace tools {
                 if (InsertIndex > Name.Length) TrueInsertIndex = Name.Length;
                 else if (InsertIndex < 0) TrueInsertIndex = Name.Length + InsertIndex < 0 ? 0 : Name.Length + InsertIndex;
                 fileinfo.NewFilename = Name.Insert(TrueInsertIndex, InsertStringBox.Text) + Suf;
-                fileinfo.IsCreateNewDir = false;
-                fileinfo.NewDir = "";
-                fileinfo.Status = "";
             }
         }
 
@@ -223,6 +205,7 @@ namespace tools {
             string splitString = SplitStringBox.Text;
             if (string.IsNullOrEmpty(splitString)) throw new Exception("请输入分隔字符串");
             foreach (var fileinfo in FileList) {
+                ResetFileInfo(fileinfo);
                 int lastIndex = fileinfo.OldFilename.LastIndexOf(splitString);
                 if (lastIndex >= 0) {
                     fileinfo.NewFilename = fileinfo.OldFilename.Substring(lastIndex + 1);
@@ -231,7 +214,6 @@ namespace tools {
                 } else {
                     fileinfo.NewFilename = fileinfo.OldFilename;
                 }
-                fileinfo.Status = "";
             }
         }
 
@@ -281,18 +263,21 @@ namespace tools {
             GetFile();
         }
 
-        private void GetFile() {
+        private async void GetFile() {
             try {
-                if (string.IsNullOrEmpty(FilePath.Trim())) {
+                if (string.IsNullOrEmpty(state.FilePath.Trim())) {
                     PathBox.Focus();
                     throw new Exception("请输入路径");
                 }
-                stateModel.IsEnabled = false;
-                GetFileList(FilePath);
+                await Task.Run(() =>
+                {
+                    state.IsEnabled = false;
+                    GetFileList(state.FilePath);
+                });
             } catch (Exception ex) {
                 ShowMessage(ex.Message);
             } finally {
-                stateModel.IsEnabled = true;
+                state.IsEnabled = true;
             }
         }
 
@@ -307,7 +292,7 @@ namespace tools {
         }
 
         private void PathBox_PreviewDrop(object sender, DragEventArgs e) {
-            FilePath = ((Array)e.Data.GetData(DataFormats.FileDrop)).GetValue(0).ToString();
+            state.FilePath = ((Array)e.Data.GetData(DataFormats.FileDrop)).GetValue(0).ToString();
         }
 
         private void PathBox_PreviewDragOver(object sender, DragEventArgs e) {
@@ -327,7 +312,7 @@ namespace tools {
         private void Clear_Click(object sender, RoutedEventArgs e) {
             if (FileList.Count > 0)
                 FileList.Clear();
-            StatusMessage = "文件数：" + FileList.Count;
+            SetStatusMessage("文件数：" + FileList.Count);
         }
 
         private void Rename_Click(object sender, RoutedEventArgs e) {
@@ -361,23 +346,30 @@ namespace tools {
                     }
                 }
             }
-            StatusMessage = "文件数：" + FileList.Count;
+            SetStatusMessage("文件数：" + FileList.Count);
         }
 
         private void FileListView_KeyUp(object sender, KeyEventArgs e) {
             if (e.Key == Key.Delete) {
-                if (FileListView.SelectedItems.Count > 0) {
-                    for (int i = FileListView.SelectedItems.Count - 1; i >= 0; i--) {
-                        FileList.RemoveAt(FileListView.Items.IndexOf(FileListView.SelectedItems[i]));
-                    }
-                    StatusMessage = "文件数：" + FileList.Count;
+                if (FileListView.SelectedItems.Count == 0) {
+                    return;
                 }
+
+                for (int i = FileListView.SelectedItems.Count - 1; i >= 0; i--) {
+                    FileList.RemoveAt(FileListView.Items.IndexOf(FileListView.SelectedItems[i]));
+                }
+                SetStatusMessage("文件数：" + FileList.Count);
             }
         }
 
         bool isDragingItem = false;
+        bool isOnItem = false;
+        private void FileListView_PreviewMouseDown(object sender, MouseButtonEventArgs e) {
+            int index = GetCurrentIndex(FileListView, e.GetPosition);
+            isOnItem = index >= 0;
+        }
         private void FileListView_MouseMove(object sender, MouseEventArgs e) {
-            if (!isDragingItem && e.LeftButton == MouseButtonState.Pressed) {
+            if (isOnItem && !isDragingItem && e.LeftButton == MouseButtonState.Pressed) {
                 isDragingItem = true;
                 DragDrop.DoDragDrop(FileListView, FileListView.SelectedItems, DragDropEffects.Move);
             }
@@ -386,12 +378,11 @@ namespace tools {
         private void BgWorker_DoWork(object sender, DoWorkEventArgs e) {
             int successNum = Rename();
             e.Result = successNum;
-            BackgroundWorker worker = sender as BackgroundWorker;
         }
 
         private void BgWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) {
             IsEnabled = true;
-            StatusMessage = string.Format("修改完毕：{0}/{1}", e.Result, FileList.Count);
+            SetStatusMessage($"修改完毕：{e.Result}/{FileList.Count}");
         }
         #endregion
 
@@ -470,21 +461,67 @@ namespace tools {
     }
     public class StateModel : NotifyPropertyChanged {
         public StateModel() {
-            IsEnabled = true;
-            FilePath = "";
         }
         public bool IsEnabled {
             get { return _IsEnabled; }
-            set { _IsEnabled = value; MyPropertyChanged("IsSuccess"); }
+            set { _IsEnabled = value; MyPropertyChanged(); }
         }
-        private bool _IsEnabled;
+        private bool _IsEnabled = true;
 
         public string FilePath {
             get { return _FilePath; }
             set {
-                _FilePath = value; MyPropertyChanged("FilePath");
+                _FilePath = value; MyPropertyChanged();
             }
         }
-        private string _FilePath;
+        private string _FilePath = "";
+
+        public string FilterString {
+            get { return _FilterString; }
+            set {
+                _FilterString = value; MyPropertyChanged();
+            }
+        }
+        private string _FilterString = "";
+
+        public bool IsGetMatch {
+            get { return _IsGetMatch; }
+            set {
+                _IsGetMatch = value; MyPropertyChanged();
+            }
+        }
+        private bool _IsGetMatch;
+
+        public bool IsGetFile {
+            get { return _IsGetFile; }
+            set {
+                _IsGetFile = value; MyPropertyChanged();
+            }
+        }
+        private bool _IsGetFile = true;
+
+        public bool IsGetFolder {
+            get { return _IsGetFolder; }
+            set {
+                _IsGetFolder = value; MyPropertyChanged();
+            }
+        }
+        private bool _IsGetFolder;
+
+        public bool IsGetChildDir {
+            get { return _IsGetChildDir; }
+            set {
+                _IsGetChildDir = value; MyPropertyChanged();
+            }
+        }
+        private bool _IsGetChildDir;
+
+        public string StatusMessage {
+            get { return _StatusMessage; }
+            set {
+                _StatusMessage = value; MyPropertyChanged();
+            }
+        }
+        private string _StatusMessage;
     }
 }
