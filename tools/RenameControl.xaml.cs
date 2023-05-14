@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
@@ -31,7 +31,7 @@ namespace tools {
             AddCharset();
             ViewList = new List<ViewModel>() {
             new ViewModel(){
-                View = RenameByReplaceStringView,
+                View = RenameByNewNameView,
                 Handler = PreviewByNewName,
             },
             new ViewModel(){
